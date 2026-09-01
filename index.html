@@ -11,37 +11,16 @@
         body { background: #f3f2f1; height: 100vh; display: flex; flex-direction: column; }
 
         .barra-menu {
-            background: #2b579a;
-            color: white;
-            padding: 5px 12px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 13px;
-            flex-wrap: wrap;
+            background: #2b579a; color: white; padding: 5px 12px;
+            display: flex; align-items: center; gap: 5px; font-size: 13px; flex-wrap: wrap;
         }
         .logo { font-weight: bold; font-size: 15px; margin-right: 15px; }
-        .menu-item {
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 2px;
-            transition: background 0.15s;
-            position: relative;
-        }
+        .menu-item { padding: 5px 10px; cursor: pointer; border-radius: 2px; transition: background 0.15s; position: relative; }
         .menu-item:hover { background: rgba(255,255,255,0.25); }
         .submenu {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background: white;
-            color: #333;
-            min-width: 220px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            z-index: 1000;
-            display: none;
-            padding: 5px 0;
+            position: absolute; top: 100%; left: 0; background: white; color: #333;
+            min-width: 220px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 1px solid #ddd; border-radius: 4px; z-index: 1000; display: none; padding: 5px 0;
         }
         .submenu-item { padding: 8px 15px; cursor: pointer; font-size: 13px; }
         .submenu-item:hover { background: #e5f3ff; }
@@ -49,173 +28,101 @@
         .menu-item:hover .submenu { display: block; }
 
         .barra-herramientas {
-            background: #fff;
-            border-bottom: 1px solid #ddd;
-            padding: 8px 12px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            align-items: center;
+            background: #fff; border-bottom: 1px solid #ddd;
+            padding: 8px 12px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
         }
         .barra-nombres {
-            background: #f0f0f0;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            padding: 5px 8px;
-            width: 70px;
-            text-align: center;
-            font-size: 12px;
-            font-weight: 600;
+            background: #f0f0f0; border: 1px solid #ccc; border-radius: 3px;
+            padding: 5px 8px; width: 70px; text-align: center; font-size: 12px; font-weight: 600;
         }
         .barra-formula {
-            flex: 1;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            padding: 5px 10px;
-            font-size: 13px;
-            min-width: 180px;
+            flex: 1; border: 1px solid #ccc; border-radius: 3px;
+            padding: 5px 10px; font-size: 13px; min-width: 180px;
         }
         button, select {
-            padding: 6px 10px;
-            border: 1px solid transparent;
-            border-radius: 3px;
-            background: transparent;
-            cursor: pointer;
-            font-size: 12px;
-            font-family: inherit;
+            padding: 6px 10px; border: 1px solid transparent; border-radius: 3px;
+            background: transparent; cursor: pointer; font-size: 12px; font-family: inherit;
         }
         button:hover, select:hover { background: #e5f3ff; border-color: #b3d9ff; }
         .separador { border-left: 1px solid #ddd; padding-left: 12px; margin-left: 6px; }
         .color-btn {
-            width: 28px;
-            height: 28px;
-            padding: 0;
-            border-radius: 4px;
-            border: 2px solid #555;
-            cursor: pointer;
-            transition: transform 0.1s;
+            width: 28px; height: 28px; padding: 0; border-radius: 4px;
+            border: 2px solid #555; cursor: pointer; transition: transform 0.1s;
         }
         .color-btn:hover { transform: scale(1.15); border-color: #000; }
         .btn-pdf {
-            background: #e74c3c;
-            color: white;
-            font-weight: bold;
-            border: none;
-            padding: 7px 14px;
+            background: #e74c3c; color: white; font-weight: bold; border: none; padding: 7px 14px;
         }
         .btn-pdf:hover { background: #c0392b; }
         .btn-op {
-            background: #e3f2fd;
-            font-weight: bold;
-            font-size: 16px;
-            width: 36px;
-            height: 36px;
-            padding: 0;
+            background: #e3f2fd; font-weight: bold; font-size: 16px;
+            width: 36px; height: 36px; padding: 0;
         }
         .btn-op:hover { background: #bbdefb; transform: scale(1.05); }
 
         .contenedor-tabla {
-            flex: 1;
-            overflow: auto;
-            background: white;
-            border-top: 1px solid #ccc;
+            flex: 1; overflow: auto; background: white; border-top: 1px solid #ccc;
         }
         table {
-            border-collapse: collapse;
-            width: 100%;
-            min-width: 1000px;
+            border-collapse: collapse; width: 100%; min-width: 1000px;
         }
+        /* ✅ LÍNEAS SOLO EN PANTALLA — SE OCULTAN EN PDF */
         th, td {
-            border: 1px solid #d0d7de; /* Líneas visibles en pantalla SOLO */
-            padding: 8px 10px;
-            min-width: 100px;
-            font-size: 13px;
-            vertical-align: middle;
+            border: 1px solid #e0e0e0; /* Solo visible en pantalla */
+            padding: 8px 10px; min-width: 100px;
+            font-size: 13px; vertical-align: middle;
         }
         th {
-            background: #f3f2f1;
-            font-weight: 600;
-            color: #333;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            text-align: center;
+            background: #f5f5f5; font-weight: 600; color: #333;
+            position: sticky; top: 0; z-index: 10; text-align: center;
         }
         td:first-child {
-            background: #f3f2f1;
-            text-align: center;
-            font-weight: 600;
-            width: 45px;
-            min-width: 45px;
-            position: sticky;
-            left: 0;
-            z-index: 5;
+            background: #f5f5f5; text-align: center; font-weight: 600;
+            width: 45px; min-width: 45px; position: sticky; left: 0; z-index: 5;
         }
-        td {
-            background: white;
-            cursor: cell;
-            outline: none;
-            transition: background 0.08s;
-        }
+        td { background: white; cursor: cell; outline: none; transition: background 0.08s; }
         td:focus, td.seleccionada {
-            border: 2px solid #2b579a;
-            padding: 7px 9px;
-            background: #e8f0fe;
+            border: 2px solid #2b579a; padding: 7px 9px; background: #e8f0fe;
         }
 
-        /* 📄 CLASE ESPECIAL PARA PDF — SIN LÍNEAS ✅ */
-        .sin-lineas-pdf th,
-        .sin-lineas-pdf td {
+        /* 📄 CLASE PARA PDF — TODO SIN LÍNEAS ✅ */
+        .pdf-sin-lineas th,
+        .pdf-sin-lineas td {
             border: none !important;
-        }
-        .sin-lineas-pdf th {
             background: transparent !important;
-            border-bottom: 2px solid #333 !important;
-            font-weight: bold;
+            outline: none !important;
+            box-shadow: none !important;
         }
-        .sin-lineas-pdf td:first-child {
+        .pdf-sin-lineas th { display: none !important; } /* Oculta encabezados A,B,C y 1,2,3 */
+        .pdf-sin-lineas td:first-child { display: none !important; } /* Oculta números de fila */
+        .pdf-sin-lineas td:focus,
+        .pdf-sin-lineas td.seleccionada {
+            border: none !important;
             background: transparent !important;
-            font-weight: normal;
-            color: #666;
+            outline: none !important;
+            box-shadow: none !important;
         }
 
         .cargando {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%,-50%);
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.2);
-            z-index: 9999;
-            display: none;
-            text-align: center;
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+            background: white; padding: 30px; border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2); z-index: 9999;
+            display: none; text-align: center;
         }
         .cargando.show { display: block; }
 
         .barra-inferior {
-            background: #f3f2f1;
-            border-top: 1px solid #ddd;
-            padding: 5px 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            background: #f3f2f1; border-top: 1px solid #ddd;
+            padding: 5px 12px; display: flex; align-items: center; gap: 8px;
         }
         .pestana {
-            padding: 7px 18px;
-            background: white;
-            border: 1px solid #ddd;
-            border-bottom: none;
-            border-radius: 4px 4px 0 0;
-            cursor: pointer;
-            font-size: 13px;
+            padding: 7px 18px; background: white; border: 1px solid #ddd;
+            border-bottom: none; border-radius: 4px 4px 0 0;
+            cursor: pointer; font-size: 13px;
         }
         .pestana.activa {
-            background: white;
-            border-bottom: 2px solid white;
-            font-weight: 600;
-            color: #2b579a;
+            background: white; border-bottom: 2px solid white;
+            font-weight: 600; color: #2b579a;
         }
 
         @media (max-width: 600px) {
@@ -311,13 +218,11 @@
     </span>
 </div>
 
-<!-- 🟧 BARRA DE HERRAMIENTAS — BOTONES OPERACIONES -->
 <div class="barra-herramientas">
     <span class="barra-nombres" id="nombre-celda">A1</span>
     <span>fx</span>
     <input type="text" class="barra-formula" id="barra-formula" placeholder="=A1+B1 o =SUMA(A1:A5)" onkeydown="ejecutarFormula(event)">
     
-    <!-- 🔤 FUENTES — 12 Tipos -->
     <select id="fuente" onchange="cambiarFuente(this.value)">
         <option value="Arial, sans-serif">Arial</option>
         <option value="'Segoe UI', sans-serif" selected>Segoe UI</option>
@@ -333,7 +238,6 @@
         <option value="'Tahoma', sans-serif">Tahoma</option>
     </select>
     
-    <!-- 📏 TAMAÑO HASTA 60px -->
     <select id="tamano-letra" onchange="cambiarTamano(this.value)">
         <option value="10px">10</option>
         <option value="12px">12</option>
@@ -349,7 +253,6 @@
         <option value="60px">60 🔥</option>
     </select>
 
-    <!-- ➕➖✖️➗ BOTONES DIRECTOS -->
     <button class="btn-op separador" onclick="agregarOperacion('+')" title="Suma">+</button>
     <button class="btn-op" onclick="agregarOperacion('-')" title="Resta">−</button>
     <button class="btn-op" onclick="agregarOperacion('*')" title="Multiplicación">×</button>
@@ -402,7 +305,7 @@
     <span class="pestana" onclick="cambiarHoja(this)">Hoja2</span>
     <span class="pestana" onclick="cambiarHoja(this)">Hoja3</span>
     <button style="margin-left:auto; padding:4px 8px; font-size:11px;" onclick="agregarHoja()">➕ Hoja</button>
-    <span style="font-size:12px; color:#666; margin-left:10px;">✅ PDF sin líneas</span>
+    <span style="font-size:12px; color:#666; margin-left:10px;">✅ PDF sin líneas ni encabezados</span>
 </div>
 
 <input type="file" id="cargador" accept=".json" style="display:none">
@@ -456,7 +359,6 @@ function detectarEnter(e) {
     }
 }
 
-// ➕➖✖️➗ OPERACIONES
 function agregarOperacion(op) {
     if (!celdaActiva) return alert('⚠️ Selecciona una celda primero');
     const barra = document.getElementById('barra-formula');
@@ -482,11 +384,9 @@ function evaluarCelda(id) {
     const celda = document.getElementById(id);
     const valor = celda.textContent.trim();
     if (!valor.startsWith('=')) { guardarDatos(); return; }
-    
     celda.dataset.formula = valor;
     let expresion = valor.substring(1);
     
-    // SUMA
     expresion = expresion.replace(/SUMA\s*\(\s*([A-Z]+)(\d+)\s*:\s*([A-Z]+)(\d+)\s*\)/gi, (m, l1, f1, l2, f2) => {
         let suma = 0;
         const ci = l1.charCodeAt(0), cf = l2.charCodeAt(0);
@@ -500,20 +400,14 @@ function evaluarCelda(id) {
         return suma;
     });
 
-    // RESTA
     expresion = expresion.replace(/RESTA\s*\(\s*([A-Z]+\d+)\s*-\s*([A-Z]+\d+)\s*\)/gi, (m, c1, c2) => obtenerValor(c1) - obtenerValor(c2));
-
-    // MULTIPLICAR
     expresion = expresion.replace(/MULTIPLICAR\s*\(\s*([A-Z]+\d+)\s*\*\s*([A-Z]+\d+)\s*\)/gi, (m, c1, c2) => obtenerValor(c1) * obtenerValor(c2));
-
-    // DIVIDIR
     expresion = expresion.replace(/DIVIDIR\s*\(\s*([A-Z]+\d+)\s*\/\s*([A-Z]+\d+)\s*\)/gi, (m, c1, c2) => {
         const v2 = obtenerValor(c2);
         if (v2 === 0) return '∞';
         return obtenerValor(c1) / v2;
     });
 
-    // PROMEDIO
     expresion = expresion.replace(/PROMEDIO\s*\(\s*([A-Z]+)(\d+)\s*:\s*([A-Z]+)(\d+)\s*\)/gi, (m, l1, f1, l2, f2) => {
         let suma = 0, cont = 0;
         const ci = l1.charCodeAt(0), cf = l2.charCodeAt(0);
@@ -527,7 +421,6 @@ function evaluarCelda(id) {
         return cont > 0 ? suma / cont : 0;
     });
 
-    // MIN
     expresion = expresion.replace(/MIN\s*\(\s*([A-Z]+)(\d+)\s*:\s*([A-Z]+)(\d+)\s*\)/gi, (m, l1, f1, l2, f2) => {
         let min = Infinity;
         const ci = l1.charCodeAt(0), cf = l2.charCodeAt(0);
@@ -541,7 +434,6 @@ function evaluarCelda(id) {
         return min === Infinity ? 0 : min;
     });
 
-    // MAX
     expresion = expresion.replace(/MAX\s*\(\s*([A-Z]+)(\d+)\s*:\s*([A-Z]+)(\d+)\s*\)/gi, (m, l1, f1, l2, f2) => {
         let max = -Infinity;
         const ci = l1.charCodeAt(0), cf = l2.charCodeAt(0);
@@ -555,13 +447,11 @@ function evaluarCelda(id) {
         return max === -Infinity ? 0 : max;
     });
 
-    // Referencias directas y operaciones simples
     expresion = expresion.replace(/([A-Z])(\d+)/g, (m, l, n) => obtenerValor(m));
 
     try {
         celda.textContent = Function(`"use strict"; return (${expresion})`)();
     } catch { celda.textContent = '#ERROR!'; }
-    
     guardarDatos();
 }
 
@@ -587,7 +477,6 @@ function calcularTodo() {
     alert('✅ Todas las fórmulas recalculadas');
 }
 
-// 🎨 ESTILOS
 function cambiarColorLetra(color) {
     if (!celdaActiva) return alert('⚠️ Toca una celda primero');
     document.getElementById(celdaActiva).style.color = color;
@@ -639,22 +528,31 @@ function limpiarCelda() {
     c.style = '';
 }
 
-// 📄 PDF SIN LÍNEAS — FUNCIÓN PRINCIPAL ✅
+// 📄 PDF — SIN LÍNEAS, SIN ENCABEZADOS, SIN BORDE DE SELECCIÓN ✅
 async function exportarPDF() {
     const cargando = document.getElementById('cargando');
     cargando.classList.add('show');
     
-    // ✅ Quitar líneas temporalmente para el PDF
     const tabla = document.getElementById('hoja');
-    tabla.classList.add('sin-lineas-pdf');
+    const zona = document.getElementById('zona-imprimir');
+    
+    // ✅ Quitar selección de celda antes de capturar
+    if (celdaActiva) {
+        const cel = document.getElementById(celdaActiva);
+        if (cel) cel.classList.remove('seleccionada');
+    }
+    
+    // ✅ Aplicar clase para quitar TODO en PDF
+    tabla.classList.add('pdf-sin-lineas');
+    zona.style.background = 'white';
     
     try {
-        const elemento = document.getElementById('zona-imprimir');
-        const lienzo = await html2canvas(elemento, { 
+        const lienzo = await html2canvas(zona, { 
             scale: 2, 
             useCORS: true, 
             backgroundColor: '#ffffff', 
-            logging: false 
+            logging: false,
+            ignoreElements: el => el.classList.contains('barra-menu') || el.classList.contains('barra-herramientas')
         });
         const imgData = lienzo.toDataURL('image/png');
         const pdf = new jsPDF('l', 'mm', 'a4');
@@ -668,29 +566,24 @@ async function exportarPDF() {
         const x = (pageWidth - finalWidth) / 2;
         pdf.addImage(imgData, 'PNG', x, 5, finalWidth, finalHeight);
         pdf.save('HojaCalculo_SinLineas.pdf');
-        alert('✅ PDF DESCARGADO — SIN LÍNEAS 🎉');
+        alert('✅ PDF DESCARGADO — TOTALMENTE LIMPIO 🎉');
     }
     catch (error) { alert('❌ Error: usa Archivo → Imprimir → Guardar como PDF'); }
     finally {
-        // ✅ Volver a mostrar líneas en pantalla
-        tabla.classList.remove('sin-lineas-pdf');
+        // ✅ Restaurar todo para seguir trabajando
+        tabla.classList.remove('pdf-sin-lineas');
+        zona.style.background = '';
         cargando.classList.remove('show');
     }
 }
 
-// 📄 PDF CON LÍNEAS — OPCIÓN ALTERNATIVA
+// 📄 PDF CON LÍNEAS
 async function exportarPDFconLineas() {
     const cargando = document.getElementById('cargando');
     cargando.classList.add('show');
-    
     try {
-        const elemento = document.getElementById('zona-imprimir');
-        const lienzo = await html2canvas(elemento, { 
-            scale: 2, 
-            useCORS: true, 
-            backgroundColor: '#ffffff', 
-            logging: false 
-        });
+        const zona = document.getElementById('zona-imprimir');
+        const lienzo = await html2canvas(zona, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
         const imgData = lienzo.toDataURL('image/png');
         const pdf = new jsPDF('l', 'mm', 'a4');
         const pageWidth = pdf.internal.pageSize.getWidth();
@@ -703,13 +596,12 @@ async function exportarPDFconLineas() {
         const x = (pageWidth - finalWidth) / 2;
         pdf.addImage(imgData, 'PNG', x, 5, finalWidth, finalHeight);
         pdf.save('HojaCalculo_ConLineas.pdf');
-        alert('✅ PDF DESCARGADO — CON LÍNEAS 📄');
+        alert('✅ PDF CON LÍNEAS descargado 📄');
     }
     catch (error) { alert('❌ Error'); }
     finally { cargando.classList.remove('show'); }
 }
 
-// RESTO DE FUNCIONES
 function insertarFilaArriba() {
     if (!celdaActiva) return alert('⚠️ Selecciona una celda primero');
     const numFila = parseInt(celdaActiva.match(/\d+/)[0]);
@@ -787,21 +679,20 @@ function pantallaCompleta() {
     else document.exitFullscreen();
 }
 function mostrarAyuda() {
-    alert(`📖 MANUAL — PDF SIN LÍNEAS ✅
+    alert(`📖 MANUAL — PDF TOTALMENTE LIMPIO ✅
 
-📄 Al exportar PDF → NO aparecen líneas
-📄 En pantalla SÍ se ven las líneas para trabajar
+📄 Al exportar PDF:
+  ❌ SIN líneas de tabla
+  ❌ SIN encabezados A,B,C y 1,2,3
+  ❌ SIN bordes de celda ni selección
+  ✅ SOLO tu contenido limpio
 
 ➕ SUMA: =A1+B1 o =SUMA(A1:A5)
 ➖ RESTA: =A1-B1 o =RESTA(A1-B1)
 ✖️ MULTIPLICACIÓN: =A1*B1 o =MULTIPLICAR(A1*B1)
 ➗ DIVISIÓN: =A1/B1 o =DIVIDIR(A1/B1)
 
-🔘 Botones rápidos: + − × ÷ =
-📏 Letras hasta 60px | 12 Fuentes
-💾 Guardar / Cargar con fórmulas y estilos
-
-¡Todo listo! 🎉`);
+¡Todo listo y limpio! 🎉`);
 }
 function guardarDatos() {
     datos = { filas, columnas, celdas: {} };
