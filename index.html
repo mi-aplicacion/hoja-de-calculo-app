@@ -3,151 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hoja de Cálculo — Estilo Office</title>
+    <title>Hoja de Cálculo — Estilo Excel</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background: #f0f0f0; padding: 10px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Arial, sans-serif; }
+        body { background: #f3f2f1; height: 100vh; display: flex; flex-direction: column; }
 
-        /* 📌 Barra de herramientas */
-        .barra-herramientas {
-            background: #2c3e50;
+        /* 🟦 BARRA SUPERIOR — MENÚ OFFICE */
+        .barra-menu {
+            background: #2b579a;
             color: white;
-            padding: 12px;
-            border-radius: 8px 8px 0 0;
+            padding: 4px 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 13px;
+        }
+        .barra-menu .logo { font-weight: bold; font-size: 15px; }
+        .barra-menu .menu-item { padding: 4px 8px; cursor: pointer; border-radius: 2px; }
+        .barra-menu .menu-item:hover { background: rgba(255,255,255,0.2); }
+
+        /* 🟧 BARRA DE FÓRMULAS Y HERRAMIENTAS */
+        .barra-herramientas {
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+            padding: 6px 10px;
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 5px;
             align-items: center;
         }
-        button {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        button:hover { background: #2980b9; }
-        button.verde { background: #27ae60; }
-        button.verde:hover { background: #219653; }
-        button.rojo { background: #e74c3c; }
-        button.rojo:hover { background: #c0392b; }
-        input.formula {
-            flex: 1;
-            min-width: 150px;
-            padding: 8px 12px;
-            border: none;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        /* 📌 Tabla / Hoja */
-        .contenedor-tabla {
-            background: white;
+        .barra-nombres {
+            background: #f0f0f0;
             border: 1px solid #ccc;
-            border-top: none;
+            border-radius: 3px;
+            padding: 4px 8px;
+            width: 60px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .barra-formula {
+            flex: 1;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            padding: 4px 8px;
+            font-size: 13px;
+            min-width: 150px;
+        }
+        button {
+            padding: 5px 10px;
+            border: 1px solid transparent;
+            border-radius: 3px;
+            background: transparent;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.15s;
+        }
+        button:hover { background: #e5f3ff; border-color: #b3d9ff; }
+        button.activo { background: #cce8ff; border-color: #99d1ff; }
+        button.separador { border-left: 1px solid #ddd; padding-left: 10px; margin-left: 5px; }
+
+        /* Colores de letra */
+        .btn-negro { color: #000; }
+        .btn-azul { color: #2980b9; }
+        .btn-rojo { color: #e74c3c; }
+        .btn-verde { color: #27ae60; }
+        .btn-naranjo { color: #e67e22; }
+
+        /* Colores de fondo */
+        .f-blanco { background: #fff; }
+        .f-celeste { background: #d6eaf8; }
+        .f-amarillo { background: #fef9e7; }
+        .f-verde { background: #d4efdf; }
+        .f-gris { background: #f2f3f4; }
+
+        /* 📊 TABLA — IGUAL A EXCEL */
+        .contenedor-tabla {
+            flex: 1;
             overflow: auto;
-            max-height: 75vh;
+            background: white;
+            border-top: 1px solid #ccc;
         }
         table {
             border-collapse: collapse;
             width: 100%;
-            min-width: 800px;
+            min-width: 1000px;
         }
         th, td {
-            border: 1px solid #ddd;
-            padding: 6px 8px;
-            text-align: left;
-            height: 32px;
+            border: 1px solid #d0d7de;
+            padding: 4px 6px;
+            height: 28px;
+            min-width: 90px;
+            font-size: 13px;
         }
         th {
-            background: #f0f0f0;
+            background: #f3f2f1;
+            font-weight: 600;
+            color: #333;
             position: sticky;
             top: 0;
             z-index: 10;
-            font-weight: 600;
-            color: #333;
+            text-align: center;
         }
         td:first-child {
-            background: #f0f0f0;
+            background: #f3f2f1;
             text-align: center;
             font-weight: 600;
-            width: 50px;
+            width: 40px;
+            min-width: 40px;
             position: sticky;
             left: 0;
             z-index: 5;
         }
         td {
             background: white;
-        }
-        td:focus {
-            outline: 2px solid #3498db;
-            outline-offset: -2px;
-        }
-        .celda-editable {
-            min-width: 100px;
             cursor: cell;
+            outline: none;
+            transition: background 0.05s;
         }
-        .celda-editable:focus {
-            background: #e8f4fd;
+        td:focus, td.seleccionada {
+            border: 2px solid #2b579a;
+            padding: 3px 5px;
+            background: #e8f0fe;
+        }
+        td.seleccionada-fila {
+            background: #e8f0fe;
         }
 
-        /* 📱 Para celular */
+        /* 📉 BARRA INFERIOR — PESTAÑAS */
+        .barra-inferior {
+            background: #f3f2f1;
+            border-top: 1px solid #ddd;
+            padding: 4px 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .pestana {
+            padding: 6px 15px;
+            background: white;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .pestana.activa {
+            background: white;
+            border-bottom: 2px solid white;
+            font-weight: 600;
+            color: #2b579a;
+        }
+
+        /* 📱 CELULAR */
         @media (max-width: 600px) {
-            th, td { padding: 4px 3px; font-size: 13px; }
-            button { padding: 6px 10px; font-size: 12px; }
+            th, td { min-width: 70px; font-size: 12px; padding: 3px 4px; }
+            button { padding: 4px 6px; font-size: 11px; }
+            .barra-herramientas { padding: 4px; }
         }
     </style>
 </head>
 <body>
 
-<!-- 🛠️ BARRA DE HERRAMIENTAS -->
-<div class="barra-herramientas">
-    <button class="verde" onclick="agregarFila()">➕ Fila</button>
-    <button class="verde" onclick="agregarColumna()">➕ Columna</button>
-    <button class="rojo" onclick="eliminarFila()">🗑️ Fila</button>
-    <button class="rojo" onclick="eliminarColumna()">🗑️ Columna</button>
-    <button onclick="calcularTodo()">🔄 Calcular</button>
-    <button onclick="guardarArchivo()">💾 Guardar</button>
-    <button onclick="cargarArchivo()">📂 Abrir</button>
-    <button onclick="limpiarTodo()">🧹 Limpiar</button>
-    <input type="text" class="formula" id="formula" placeholder="Fórmula: =SUMA(A1:A5) o =A1+B1">
+<!-- 🟦 BARRA DE MENÚ — IGUAL A EXCEL -->
+<div class="barra-menu">
+    <span class="logo">📊 Hoja de Cálculo</span>
+    <span class="menu-item">Archivo</span>
+    <span class="menu-item">Inicio</span>
+    <span class="menu-item">Insertar</span>
+    <span class="menu-item">Fórmulas</span>
+    <span class="menu-item">Ver</span>
 </div>
 
-<!-- 📊 LA HOJA DE CÁLCULO -->
+<!-- 🟧 BARRA DE HERRAMIENTAS COMPLETA -->
+<div class="barra-herramientas">
+    <span class="barra-nombres" id="nombre-celda">A1</span>
+    <span>fx</span>
+    <input type="text" class="barra-formula" id="barra-formula" placeholder="Escribe fórmula: =SUMA(A1:A5)" onkeydown="ejecutarFormula(event)">
+    
+    <!-- ⬆️ FORMATO DE TEXTO -->
+    <button onclick="alternarNegrita()" title="Negrita">B</button>
+    <button onclick="alternarCursiva()" title="Cursiva">I</button>
+    <button onclick="alternarSubrayado()" title="Subrayado">U</button>
+
+    <!-- 📐 ALINEACIÓN -->
+    <button class="separador" onclick="alinearIzquierda()" title="Alinear izquierda">◀</button>
+    <button onclick="centrarTexto()" title="Centrar">≡</button>
+    <button onclick="alinearDerecha()" title="Alinear derecha">▶</button>
+
+    <!-- 🎨 COLORES DE LETRA -->
+    <button class="separador btn-negro" onclick="cambiarColorLetra('#000000')" title="Color de letra">■</button>
+    <button class="btn-azul" onclick="cambiarColorLetra('#2980b9')">■</button>
+    <button class="btn-rojo" onclick="cambiarColorLetra('#e74c3c')">■</button>
+    <button class="btn-verde" onclick="cambiarColorLetra('#27ae60')">■</button>
+    <button class="btn-naranjo" onclick="cambiarColorLetra('#e67e22')">■</button>
+
+    <!-- 🖍️ COLORES DE FONDO -->
+    <button class="separador f-blanco" onclick="cambiarFondo('#ffffff')" title="Color de fondo">□</button>
+    <button class="f-celeste" onclick="cambiarFondo('#d6eaf8')">□</button>
+    <button class="f-amarillo" onclick="cambiarFondo('#fef9e7')">□</button>
+    <button class="f-verde" onclick="cambiarFondo('#d4efdf')">□</button>
+    <button class="f-gris" onclick="cambiarFondo('#f2f3f4')">□</button>
+
+    <!-- 📏 TAMAÑO Y FUENTE -->
+    <button class="separador" onclick="cambiarTamano('12px')">Pequeño</button>
+    <button onclick="cambiarTamano('14px')">Normal</button>
+    <button onclick="cambiarTamano('16px')">Grande</button>
+
+    <!-- 💾 ACCIONES -->
+    <button class="separador" onclick="guardarArchivo()" title="Guardar">💾</button>
+    <button onclick="cargarArchivo()" title="Abrir">📂</button>
+    <button onclick="calcularTodo()" title="Recalcular">🔄</button>
+    <button onclick="agregarFila()" title="Agregar fila">➕Fila</button>
+    <button onclick="agregarColumna()" title="Agregar columna">➕Col</button>
+</div>
+
+<!-- 📊 LA TABLA -->
 <div class="contenedor-tabla">
     <table id="hoja">
         <thead id="cabecera">
             <tr>
-                <th></th>
-                <th>A</th>
-                <th>B</th>
-                <th>C</th>
-                <th>D</th>
-                <th>E</th>
-                <th>F</th>
-                <th>G</th>
-                <th>H</th>
-                <th>I</th>
-                <th>J</th>
+                <th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th><th>H</th><th>I</th><th>J</th>
+                <th>K</th><th>L</th><th>M</th><th>N</th><th>O</th>
             </tr>
         </thead>
-        <tbody id="cuerpo">
-            <!-- Se llenan las filas automáticamente -->
-        </tbody>
+        <tbody id="cuerpo"></tbody>
     </table>
+</div>
+
+<!-- 📉 BARRA INFERIOR -->
+<div class="barra-inferior">
+    <span class="pestana activa">Hoja1</span>
+    <span class="pestana">Hoja2</span>
+    <span class="pestana">Hoja3</span>
+    <span style="margin-left:auto; font-size:12px; color:#666;">Listo ✅</span>
 </div>
 
 <input type="file" id="cargador" accept=".json" style="display:none">
 
 <script>
-// 📌 CONFIGURACIÓN INICIAL
-let filas = 20;
-let columnas = 10;
+let filas = 100, columnas = 15;
 let celdaActiva = null;
+let datos = {};
 
-// 📌 INICIAR LA TABLA
+// 📌 INICIAR TABLA — IGUAL A EXCEL
 function iniciarTabla() {
     const cuerpo = document.getElementById('cuerpo');
     cuerpo.innerHTML = '';
@@ -159,10 +258,9 @@ function iniciarTabla() {
         for (let j = 0; j < columnas; j++) {
             const letra = String.fromCharCode(65 + j);
             const celda = document.createElement('td');
-            celda.className = 'celda-editable';
             celda.contentEditable = true;
             celda.id = `${letra}${i}`;
-            celda.setAttribute('onfocus', `celdaSeleccionada('${letra}${i}')`);
+            celda.setAttribute('onclick', `seleccionarCelda('${letra}${i}')`);
             celda.setAttribute('onblur', `evaluarCelda('${letra}${i}')`);
             fila.appendChild(celda);
         }
@@ -170,68 +268,84 @@ function iniciarTabla() {
     }
 }
 
-// 📌 SELECCIONAR CELDA
-function celdaSeleccionada(id) {
+// 📌 SELECCIONAR CELDA — ACTUALIZA BARRA DE FÓRMULAS
+function seleccionarCelda(id) {
+    // Quitar selección anterior
+    if (celdaActiva) {
+        const ant = document.getElementById(celdaActiva);
+        if (ant) ant.classList.remove('seleccionada');
+    }
+    // Nueva selección
     celdaActiva = id;
-    document.getElementById('formula').value = document.getElementById(id).textContent;
+    const celda = document.getElementById(id);
+    celda.classList.add('seleccionada');
+    // Actualizar barra de nombre y fórmula
+    document.getElementById('nombre-celda').textContent = id;
+    document.getElementById('barra-formula').value = celda.dataset.formula || celda.textContent;
 }
 
-// 📌 EVALUAR FÓRMULAS
+// 📌 EVALUAR FÓRMULAS — EXACTAMENTE COMO EXCEL
 function evaluarCelda(id) {
     const celda = document.getElementById(id);
     const valor = celda.textContent.trim();
     
     if (valor.startsWith('=')) {
+        celda.dataset.formula = valor;
+        let expresion = valor.substring(1);
+        
+        // =SUMA(A1:A5)
+        expresion = expresion.replace(/SUMA\((\w)(\d+):(\w)(\d+)\)/gi, (m, l1, f1, l2, f2) => {
+            let suma = 0;
+            const ci = l1.charCodeAt(0), cf = l2.charCodeAt(0);
+            for (let f = parseInt(f1); f <= parseInt(f2); f++) {
+                for (let c = ci; c <= cf; c++) {
+                    const cel = document.getElementById(`${String.fromCharCode(c)}${f}`);
+                    if (cel && !isNaN(parseFloat(cel.textContent))) suma += parseFloat(cel.textContent);
+                }
+            }
+            return suma;
+        });
+
+        // =PROMEDIO(A1:A5)
+        expresion = expresion.replace(/PROMEDIO\((\w)(\d+):(\w)(\d+)\)/gi, (m, l1, f1, l2, f2) => {
+            let suma = 0, cont = 0;
+            const ci = l1.charCodeAt(0), cf = l2.charCodeAt(0);
+            for (let f = parseInt(f1); f <= parseInt(f2); f++) {
+                for (let c = ci; c <= cf; c++) {
+                    const cel = document.getElementById(`${String.fromCharCode(c)}${f}`);
+                    if (cel && !isNaN(parseFloat(cel.textContent))) { suma += parseFloat(cel.textContent); cont++; }
+                }
+            }
+            return cont > 0 ? suma / cont : 0;
+        });
+
+        // Referencias directas: =A1+B1*2
+        expresion = expresion.replace(/([A-Z])(\d+)/g, (m, l, n) => {
+            const v = document.getElementById(m)?.textContent || 0;
+            return isNaN(parseFloat(v)) ? 0 : v;
+        });
+
         try {
-            let expresion = valor.substring(1);
-            
-            // SUMA: =SUMA(A1:A5)
-            expresion = expresion.replace(/SUMA\((\w)(\d+):(\w)(\d+)\)/gi, (match, l1, f1, l2, f2) => {
-                let suma = 0;
-                const colInicio = l1.charCodeAt(0);
-                const colFin = l2.charCodeAt(0);
-                for (let fila = parseInt(f1); fila <= parseInt(f2); fila++) {
-                    for (let col = colInicio; col <= colFin; col++) {
-                        const c = document.getElementById(`${String.fromCharCode(col)}${fila}`);
-                        if (c && !isNaN(parseFloat(c.textContent))) suma += parseFloat(c.textContent);
-                    }
-                }
-                return suma;
-            });
-            
-            // PROMEDIO: =PROMEDIO(A1:A5)
-            expresion = expresion.replace(/PROMEDIO\((\w)(\d+):(\w)(\d+)\)/gi, (match, l1, f1, l2, f2) => {
-                let suma = 0, cont = 0;
-                const colInicio = l1.charCodeAt(0);
-                const colFin = l2.charCodeAt(0);
-                for (let fila = parseInt(f1); fila <= parseInt(f2); fila++) {
-                    for (let col = colInicio; col <= colFin; col++) {
-                        const c = document.getElementById(`${String.fromCharCode(col)}${fila}`);
-                        if (c && !isNaN(parseFloat(c.textContent))) { suma += parseFloat(c.textContent); cont++; }
-                    }
-                }
-                return cont > 0 ? suma / cont : 0;
-            });
-
-            // Referencias directas: =A1+B1*2
-            expresion = expresion.replace(/([A-Z])(\d+)/g, (match, letra, num) => {
-                const val = document.getElementById(match)?.textContent || 0;
-                return isNaN(parseFloat(val)) ? 0 : val;
-            });
-
-            const resultado = eval(expresion);
-            celda.textContent = resultado;
-            celda.dataset.formula = valor; // Guardar fórmula original
-        } catch (e) {
-            celda.textContent = 'ERROR';
+            celda.textContent = eval(expresion);
+        } catch {
+            celda.textContent = '#ERROR!';
         }
+    }
+    guardarDatos();
+}
+
+// 📌 EJECUTAR DESDE BARRA DE FÓRMULAS
+function ejecutarFormula(e) {
+    if (e.key === 'Enter' && celdaActiva) {
+        const valor = document.getElementById('barra-formula').value;
+        document.getElementById(celdaActiva).textContent = valor;
+        evaluarCelda(celdaActiva);
     }
 }
 
 // 📌 RECALCULAR TODO
 function calcularTodo() {
-    const celdas = document.querySelectorAll('.celda-editable');
-    celdas.forEach(c => {
+    document.querySelectorAll('td').forEach(c => {
         if (c.dataset.formula) {
             c.textContent = c.dataset.formula;
             evaluarCelda(c.id);
@@ -239,64 +353,86 @@ function calcularTodo() {
     });
 }
 
-// 📌 AGREGAR/ELIMINAR FILAS Y COLUMNAS
-function agregarFila() { filas++; iniciarTabla(); }
-function eliminarFila() { if (filas > 1) filas--; iniciarTabla(); }
-function agregarColumna() { columnas++; actualizarCabecera(); iniciarTabla(); }
-function eliminarColumna() { if (columnas > 1) columnas--; actualizarCabecera(); iniciarTabla(); }
+// 📌 FORMATO DE CELDA
+function alternarNegrita() { if (!celdaActiva) return; document.getElementById(celdaActiva).style.fontWeight = document.getElementById(celdaActiva).style.fontWeight === 'bold' ? 'normal' : 'bold'; }
+function alternarCursiva() { if (!celdaActiva) return; document.getElementById(celdaActiva).style.fontStyle = document.getElementById(celdaActiva).style.fontStyle === 'italic' ? 'normal' : 'italic'; }
+function alternarSubrayado() { if (!celdaActiva) return; document.getElementById(celdaActiva).style.textDecoration = document.getElementById(celdaActiva).style.textDecoration === 'underline' ? 'none' : 'underline'; }
+function centrarTexto() { if (!celdaActiva) return; document.getElementById(celdaActiva).style.textAlign = 'center'; }
+function alinearIzquierda() { if (!celdaActiva) return; document.getElementById(celdaActiva).style.textAlign = 'left'; }
+function alinearDerecha() { if (!celdaActiva) return; document.getElementById(celdaActiva).style.textAlign = 'right'; }
+function cambiarColorLetra(color) { if (!celdaActiva) return; document.getElementById(celdaActiva).style.color = color; }
+function cambiarFondo(color) { if (!celdaActiva) return; document.getElementById(celdaActiva).style.backgroundColor = color; }
+function cambiarTamano(tam) { if (!celdaActiva) return; document.getElementById(celdaActiva).style.fontSize = tam; }
 
+// 📌 AGREGAR FILAS Y COLUMNAS
+function agregarFila() { filas++; iniciarTabla(); }
+function agregarColumna() { columnas++; actualizarCabecera(); iniciarTabla(); }
 function actualizarCabecera() {
     const cab = document.getElementById('cabecera').firstElementChild;
     cab.innerHTML = '<th></th>';
-    for (let j = 0; j < columnas; j++) {
-        cab.innerHTML += `<th>${String.fromCharCode(65 + j)}</th>`;
-    }
+    for (let j = 0; j < columnas; j++) cab.innerHTML += `<th>${String.fromCharCode(65 + j)}</th>`;
 }
 
-// 📌 GUARDAR Y CARGAR ARCHIVO
-function guardarArchivo() {
-    const datos = { filas, columnas, celdas: {} };
-    document.querySelectorAll('.celda-editable').forEach(c => {
-        datos.celdas[c.id] = { texto: c.textContent, formula: c.dataset.formula || '' };
+// 📌 GUARDAR Y CARGAR
+function guardarDatos() {
+    datos = { filas, columnas, celdas: {} };
+    document.querySelectorAll('td[contenteditable="true"]').forEach(c => {
+        datos.celdas[c.id] = {
+            texto: c.textContent,
+            formula: c.dataset.formula || '',
+            estilo: {
+                color: c.style.color,
+                fondo: c.style.backgroundColor,
+                negrita: c.style.fontWeight,
+                tamano: c.style.fontSize,
+                alineacion: c.style.textAlign
+            }
+        };
     });
+}
+
+function guardarArchivo() {
+    guardarDatos();
     const blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'hoja-calculo.json';
+    a.download = 'HojaCalculo.json';
     a.click();
 }
 
-function cargarArchivo() {
-    document.getElementById('cargador').click();
-}
+function cargarArchivo() { document.getElementById('cargador').click(); }
 
-document.getElementById('cargador').addEventListener('change', (e) => {
-    const archivo = e.target.files[0];
-    if (!archivo) return;
+document.getElementById('cargador').addEventListener('change', e => {
+    const arch = e.target.files[0];
+    if (!arch) return;
     const lector = new FileReader();
-    lector.onload = (event) => {
-        const datos = JSON.parse(event.target.result);
-        filas = datos.filas;
-        columnas = datos.columnas;
-        actualizarCabecera();
-        iniciarTabla();
-        Object.keys(datos.celdas).forEach(id => {
-            const celda = document.getElementById(id);
-            if (celda) {
-                celda.textContent = datos.celdas[id].texto;
-                if (datos.celdas[id].formula) celda.dataset.formula = datos.celdas[id].formula;
-            }
-        });
+    lector.onload = evt => {
+        const d = JSON.parse(evt.target.result);
+        filas = d.filas; columnas = d.columnas;
+        actualizarCabecera(); iniciarTabla();
+        setTimeout(() => {
+            Object.keys(d.celdas).forEach(id => {
+                const c = document.getElementById(id);
+                if (c) {
+                    c.textContent = d.celdas[id].texto;
+                    if (d.celdas[id].formula) c.dataset.formula = d.celdas[id].formula;
+                    if (d.celdas[id].estilo) {
+                        c.style.color = d.celdas[id].estilo.color || '';
+                        c.style.backgroundColor = d.celdas[id].estilo.fondo || '';
+                        c.style.fontWeight = d.celdas[id].estilo.negrita || '';
+                        c.style.fontSize = d.celdas[id].estilo.tamano || '';
+                        c.style.textAlign = d.celdas[id].estilo.alineacion || '';
+                    }
+                }
+            });
+            calcularTodo();
+        }, 10);
     };
-    lector.readAsText(archivo);
+    lector.readAsText(arch);
 });
 
-function limpiarTodo() {
-    if (confirm('¿Borrar todo?')) iniciarTabla();
-}
-
-// 📌 INICIAR AL CARGAR
+// 🚀 INICIAR AL CARGAR
 iniciarTabla();
 </script>
 
