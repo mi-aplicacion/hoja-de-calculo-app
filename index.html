@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoja de Cálculo — Estilo Office</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background: #f0f0f0; padding: 10px; }
+
+        /* 📌 Barra de herramientas */
+        .barra-herramientas {
+            background: #2c3e50;
+            color: white;
+            padding: 12px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover { background: #2980b9; }
+        button.verde { background: #27ae60; }
+        button.verde:hover { background: #219653; }
+        button.rojo { background: #e74c3c; }
+        button.rojo:hover { background: #c0392b; }
+        input.formula {
+            flex: 1;
+            min-width: 150px;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        /* 📌 Tabla / Hoja */
+        .contenedor-tabla {
+            background: white;
+            border: 1px solid #ccc;
+            border-top: none;
+            overflow: auto;
+            max-height: 75vh;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 800px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 6px 8px;
+            text-align: left;
+            height: 32px;
+        }
+        th {
+            background: #f0f0f0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            font-weight: 600;
+            color: #333;
+        }
+        td:first-child {
+            background: #f0f0f0;
+            text-align: center;
+            font-weight: 600;
+            width: 50px;
+            position: sticky;
+            left: 0;
+            z-index: 5;
+        }
+        td {
+            background: white;
+        }
+        td:focus {
+            outline: 2px solid #3498db;
+            outline-offset: -2px;
+        }
+        .celda-editable {
+            min-width: 100px;
+            cursor: cell;
+        }
+        .celda-editable:focus {
+            background: #e8f4fd;
+        }
+
+        /* 📱 Para celular */
+        @media (max-width: 600px) {
+            th, td { padding: 4px 3px; font-size: 13px; }
+            button { padding: 6px 10px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- 🛠️ BARRA DE HERRAMIENTAS -->
+<div class="barra-herramientas">
+    <button class="verde" onclick="agregarFila()">➕ Fila</button>
+    <button class="verde" onclick="agregarColumna()">➕ Columna</button>
+    <button class="rojo" onclick="eliminarFila()">🗑️ Fila</button>
+    <button class="rojo" onclick="eliminarColumna()">🗑️ Columna</button>
+    <button onclick="calcularTodo()">🔄 Calcular</button>
+    <button onclick="guardarArchivo()">💾 Guardar</button>
+    <button onclick="cargarArchivo()">📂 Abrir</button>
+    <button onclick="limpiarTodo()">🧹 Limpiar</button>
+    <input type="text" class="formula" id="formula" placeholder="Fórmula: =SUMA(A1:A5) o =A1+B1">
+</div>
+
+<!-- 📊 LA HOJA DE CÁLCULO -->
+<div class="contenedor-tabla">
+    <table id="hoja">
+        <thead id="cabecera">
+            <tr>
+                <th></th>
+                <th>A</th>
+                <th>B</th>
+                <th>C</th>
+                <th>D</th>
+                <th>E</th>
+                <th>F</th>
+                <th>G</th>
+                <th>H</th>
+                <th>I</th>
+                <th>J</th>
+            </tr>
+        </thead>
+        <tbody id="cuerpo">
+            <!-- Se llenan las filas automáticamente -->
+        </tbody>
+    </table>
+</div>
+
+<input type="file" id="cargador" accept=".json" style="display:none">
+
+<script>
+// 📌 CONFIGURACIÓN INICIAL
+let filas = 20;
+let columnas = 10;
+let celdaActiva = null;
+
+// 📌 INICIAR LA TABLA
+function iniciarTabla() {
+    const cuerpo = document.getElementById('cuerpo');
+    cuerpo.innerHTML = '';
+    
+    for (let i = 1; i <= filas; i++) {
+        const fila = document.createElement('tr');
+        fila.innerHTML = `<td>${i}</td>`;
+        
+        for (let j = 0; j < columnas; j++) {
+            const letra = String.fromCharCode(65 + j);
+            const celda = document.createElement('td');
+            celda.className = 'celda-editable';
+            celda.contentEditable = true;
+            celda.id = `${letra}${i}`;
+            celda.setAttribute('onfocus', `celdaSeleccionada('${letra}${i}')`);
+            celda.setAttribute('onblur', `evaluarCelda('${letra}${i}')`);
+            fila.appendChild(celda);
+        }
+        cuerpo.appendChild(fila);
+    }
+}
+
+// 📌 SELECCIONAR CELDA
+function celdaSeleccionada(id) {
+    celdaActiva = id;
+    document.getElementById('formula').value = document.getElementById(id).textContent;
+}
+
+// 📌 EVALUAR FÓRMULAS
+function evaluarCelda(id) {
+    const celda = document.getElementById(id);
+    const valor = celda.textContent.trim();
+    
+    if (valor.startsWith('=')) {
+        try {
+            let expresion = valor.substring(1);
+            
+            // SUMA: =SUMA(A1:A5)
+            expresion = expresion.replace(/SUMA\((\w)(\d+):(\w)(\d+)\)/gi, (match, l1, f1, l2, f2) => {
+                let suma = 0;
+                const colInicio = l1.charCodeAt(0);
+                const colFin = l2.charCodeAt(0);
+                for (let fila = parseInt(f1); fila <= parseInt(f2); fila++) {
+                    for (let col = colInicio; col <= colFin; col++) {
+                        const c = document.getElementById(`${String.fromCharCode(col)}${fila}`);
+                        if (c && !isNaN(parseFloat(c.textContent))) suma += parseFloat(c.textContent);
+                    }
+                }
+                return suma;
+            });
+            
+            // PROMEDIO: =PROMEDIO(A1:A5)
+            expresion = expresion.replace(/PROMEDIO\((\w)(\d+):(\w)(\d+)\)/gi, (match, l1, f1, l2, f2) => {
+                let suma = 0, cont = 0;
+                const colInicio = l1.charCodeAt(0);
+                const colFin = l2.charCodeAt(0);
+                for (let fila = parseInt(f1); fila <= parseInt(f2); fila++) {
+                    for (let col = colInicio; col <= colFin; col++) {
+                        const c = document.getElementById(`${String.fromCharCode(col)}${fila}`);
+                        if (c && !isNaN(parseFloat(c.textContent))) { suma += parseFloat(c.textContent); cont++; }
+                    }
+                }
+                return cont > 0 ? suma / cont : 0;
+            });
+
+            // Referencias directas: =A1+B1*2
+            expresion = expresion.replace(/([A-Z])(\d+)/g, (match, letra, num) => {
+                const val = document.getElementById(match)?.textContent || 0;
+                return isNaN(parseFloat(val)) ? 0 : val;
+            });
+
+            const resultado = eval(expresion);
+            celda.textContent = resultado;
+            celda.dataset.formula = valor; // Guardar fórmula original
+        } catch (e) {
+            celda.textContent = 'ERROR';
+        }
+    }
+}
+
+// 📌 RECALCULAR TODO
+function calcularTodo() {
+    const celdas = document.querySelectorAll('.celda-editable');
+    celdas.forEach(c => {
+        if (c.dataset.formula) {
+            c.textContent = c.dataset.formula;
+            evaluarCelda(c.id);
+        }
+    });
+}
+
+// 📌 AGREGAR/ELIMINAR FILAS Y COLUMNAS
+function agregarFila() { filas++; iniciarTabla(); }
+function eliminarFila() { if (filas > 1) filas--; iniciarTabla(); }
+function agregarColumna() { columnas++; actualizarCabecera(); iniciarTabla(); }
+function eliminarColumna() { if (columnas > 1) columnas--; actualizarCabecera(); iniciarTabla(); }
+
+function actualizarCabecera() {
+    const cab = document.getElementById('cabecera').firstElementChild;
+    cab.innerHTML = '<th></th>';
+    for (let j = 0; j < columnas; j++) {
+        cab.innerHTML += `<th>${String.fromCharCode(65 + j)}</th>`;
+    }
+}
+
+// 📌 GUARDAR Y CARGAR ARCHIVO
+function guardarArchivo() {
+    const datos = { filas, columnas, celdas: {} };
+    document.querySelectorAll('.celda-editable').forEach(c => {
+        datos.celdas[c.id] = { texto: c.textContent, formula: c.dataset.formula || '' };
+    });
+    const blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'hoja-calculo.json';
+    a.click();
+}
+
+function cargarArchivo() {
+    document.getElementById('cargador').click();
+}
+
+document.getElementById('cargador').addEventListener('change', (e) => {
+    const archivo = e.target.files[0];
+    if (!archivo) return;
+    const lector = new FileReader();
+    lector.onload = (event) => {
+        const datos = JSON.parse(event.target.result);
+        filas = datos.filas;
+        columnas = datos.columnas;
+        actualizarCabecera();
+        iniciarTabla();
+        Object.keys(datos.celdas).forEach(id => {
+            const celda = document.getElementById(id);
+            if (celda) {
+                celda.textContent = datos.celdas[id].texto;
+                if (datos.celdas[id].formula) celda.dataset.formula = datos.celdas[id].formula;
+            }
+        });
+    };
+    lector.readAsText(archivo);
+});
+
+function limpiarTodo() {
+    if (confirm('¿Borrar todo?')) iniciarTabla();
+}
+
+// 📌 INICIAR AL CARGAR
+iniciarTabla();
+</script>
+
+</body>
+</html>
+
