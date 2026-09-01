@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hoja de Cálculo — Con PDF</title>
-    <!-- 📄 LIBRERÍAS PARA PDF DIRECTO -->
+    <title>Hoja de Cálculo — 4 Operaciones</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Arial, sans-serif; }
         body { background: #f3f2f1; height: 100vh; display: flex; flex-direction: column; }
 
-        /* 🟦 BARRA DE MENÚ */
         .barra-menu {
             background: #2b579a;
             color: white;
@@ -30,16 +28,14 @@
             transition: background 0.15s;
             position: relative;
         }
-        .menu-item:hover, .menu-item.activo { background: rgba(255,255,255,0.25); }
-        
-        /* 📋 SUBMENÚS */
+        .menu-item:hover { background: rgba(255,255,255,0.25); }
         .submenu {
             position: absolute;
             top: 100%;
             left: 0;
             background: white;
             color: #333;
-            min-width: 200px;
+            min-width: 220px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -47,18 +43,11 @@
             display: none;
             padding: 5px 0;
         }
-        .submenu-item {
-            padding: 8px 15px;
-            cursor: pointer;
-            font-size: 13px;
-            display: flex;
-            justify-content: space-between;
-        }
+        .submenu-item { padding: 8px 15px; cursor: pointer; font-size: 13px; }
         .submenu-item:hover { background: #e5f3ff; }
         .submenu-separador { border-top: 1px solid #eee; margin: 4px 0; }
         .menu-item:hover .submenu { display: block; }
 
-        /* 🟧 BARRA DE HERRAMIENTAS */
         .barra-herramientas {
             background: #fff;
             border-bottom: 1px solid #ddd;
@@ -93,16 +82,38 @@
             background: transparent;
             cursor: pointer;
             font-size: 12px;
-            transition: all 0.15s;
             font-family: inherit;
         }
         button:hover, select:hover { background: #e5f3ff; border-color: #b3d9ff; }
         .separador { border-left: 1px solid #ddd; padding-left: 12px; margin-left: 6px; }
-        .color-btn { width: 24px; height: 24px; padding: 0; border-radius: 3px; border: 1px solid #aaa; }
-        .btn-pdf { background: #e74c3c; color: white; font-weight: bold; border: none; }
+        .color-btn {
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            border-radius: 4px;
+            border: 2px solid #555;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .color-btn:hover { transform: scale(1.15); border-color: #000; }
+        .btn-pdf {
+            background: #e74c3c;
+            color: white;
+            font-weight: bold;
+            border: none;
+            padding: 7px 14px;
+        }
         .btn-pdf:hover { background: #c0392b; }
+        .btn-op {
+            background: #e3f2fd;
+            font-weight: bold;
+            font-size: 16px;
+            width: 36px;
+            height: 36px;
+            padding: 0;
+        }
+        .btn-op:hover { background: #bbdefb; transform: scale(1.05); }
 
-        /* 📊 TABLA */
         .contenedor-tabla {
             flex: 1;
             overflow: auto;
@@ -117,7 +128,6 @@
         th, td {
             border: 1px solid #d0d7de;
             padding: 5px 8px;
-            height: 30px;
             min-width: 100px;
             font-size: 13px;
             vertical-align: middle;
@@ -153,7 +163,21 @@
             background: #e8f0fe;
         }
 
-        /* 📉 BARRA INFERIOR */
+        .cargando {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: none;
+            text-align: center;
+        }
+        .cargando.show { display: block; }
+
         .barra-inferior {
             background: #f3f2f1;
             border-top: 1px solid #ddd;
@@ -177,56 +201,70 @@
             font-weight: 600;
             color: #2b579a;
         }
-        .cargando { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.2); z-index: 9999; display: none; text-align: center; }
-        .cargando.show { display: block; }
 
-        /* 📱 CELULAR */
         @media (max-width: 600px) {
             th, td { min-width: 75px; font-size: 12px; padding: 4px 5px; }
             button, select { padding: 5px 7px; font-size: 11px; }
+            .btn-op { width: 32px; height: 32px; font-size: 14px; }
         }
     </style>
 </head>
 <body>
 
-<!-- ⏳ CARGANDO PARA PDF -->
 <div class="cargando" id="cargando">
     <h3>📄 Generando PDF...</h3>
-    <p>Por favor espera unos segundos ⏳</p>
+    <p>Un momento por favor ⏳</p>
 </div>
 
-<!-- 🟦 BARRA DE MENÚ -->
 <div class="barra-menu">
-    <span class="logo">📊 Hoja de Cálculo</span>
-    
-    <!-- 📁 ARCHIVO — CON PDF ✅ -->
+    <span class="logo">📊 Hoja de Cálculo-R.S</span>
     <span class="menu-item">
         Archivo
         <div class="submenu">
             <div class="submenu-item" onclick="guardarArchivo()">💾 Guardar</div>
             <div class="submenu-item" onclick="cargarArchivo()">📂 Abrir</div>
-            <div class="submenu-item" onclick="exportarPDF()">📄 Exportar a PDF ✅</div>
+            <div class="submenu-item" onclick="exportarPDF()">📄 Exportar PDF</div>
             <div class="submenu-separador"></div>
             <div class="submenu-item" onclick="nuevoDocumento()">🆕 Nuevo</div>
             <div class="submenu-separador"></div>
             <div class="submenu-item" onclick="window.print()">🖨️ Imprimir</div>
         </div>
     </span>
-
-    <span class="menu-item activo">
+    <span class="menu-item">
+        Fórmulas ➕➖✖️➗
+        <div class="submenu">
+            <div class="submenu-item" onclick="insertarFormula('=SUMA(A1:A5)')">➕ =SUMA(A1:A5)</div>
+            <div class="submenu-item" onclick="insertarFormula('=RESTA(A1-B1)')">➖ =RESTA(A1-B1)</div>
+            <div class="submenu-item" onclick="insertarFormula('=MULTIPLICAR(A1*B1)')">✖️ =MULTIPLICAR(A1*B1)</div>
+            <div class="submenu-item" onclick="insertarFormula('=DIVIDIR(A1/B1)')">➗ =DIVIDIR(A1/B1)</div>
+            <div class="submenu-separador"></div>
+            <div class="submenu-item" onclick="insertarFormula('=PROMEDIO(A1:A5)')">📊 =PROMEDIO(A1:A5)</div>
+            <div class="submenu-item" onclick="insertarFormula('=MIN(A1:A5)')">⬇️ =MIN(A1:A5)</div>
+            <div class="submenu-item" onclick="insertarFormula('=MAX(A1:A5)')">⬆️ =MAX(A1:A5)</div>
+            <div class="submenu-separador"></div>
+            <div class="submenu-item" onclick="calcularTodo()">🔄 Recalcular todo</div>
+        </div>
+    </span>
+    <span class="menu-item">
         Inicio
         <div class="submenu">
             <div class="submenu-item" onclick="alternarNegrita()">B — Negrita</div>
             <div class="submenu-item" onclick="alternarCursiva()">I — Cursiva</div>
             <div class="submenu-item" onclick="alternarSubrayado()">U — Subrayado</div>
             <div class="submenu-separador"></div>
-            <div class="submenu-item" onclick="cambiarColorLetra('#000')">Color de letra</div>
-            <div class="submenu-item" onclick="cambiarFondo('#fff')">Color de fondo</div>
+            <div class="submenu-item" onclick="cambiarColorLetra('#000000')">⚫ Letra Negro</div>
+            <div class="submenu-item" onclick="cambiarColorLetra('#e74c3c')">🔴 Rojo</div>
+            <div class="submenu-item" onclick="cambiarColorLetra('#3498db')">🔵 Azul</div>
+            <div class="submenu-item" onclick="cambiarColorLetra('#27ae60')">🟢 Verde</div>
             <div class="submenu-separador"></div>
-            <div class="submenu-item" onclick="limpiarCelda()">🗑️ Borrar contenido</div>
+            <div class="submenu-item" onclick="cambiarFondo('#ffffff')">⬜ Fondo Blanco</div>
+            <div class="submenu-item" onclick="cambiarFondo('#fef9e7')">🟡 Amarillo</div>
+            <div class="submenu-item" onclick="cambiarFondo('#d4efdf')">🟩 Verde claro</div>
+            <div class="submenu-item" onclick="cambiarFondo('#d6eaf8')">🟦 Azul claro</div>
+            <div class="submenu-separador"></div>
+            <div class="submenu-item" onclick="limpiarCelda()">🗑️ Borrar</div>
         </div>
     </span>
-
     <span class="menu-item">
         Insertar
         <div class="submenu">
@@ -237,19 +275,6 @@
             <div class="submenu-item" onclick="agregarHoja()">📄 Nueva hoja</div>
         </div>
     </span>
-
-    <span class="menu-item">
-        Fórmulas
-        <div class="submenu">
-            <div class="submenu-item" onclick="insertarFormula('=SUMA(A1:A5)')">=SUMA()</div>
-            <div class="submenu-item" onclick="insertarFormula('=PROMEDIO(A1:A5)')">=PROMEDIO()</div>
-            <div class="submenu-item" onclick="insertarFormula('=MIN(A1:A5)')">=MIN()</div>
-            <div class="submenu-item" onclick="insertarFormula('=MAX(A1:A5)')">=MAX()</div>
-            <div class="submenu-separador"></div>
-            <div class="submenu-item" onclick="calcularTodo()">🔄 Recalcular todo</div>
-        </div>
-    </span>
-
     <span class="menu-item">
         Ver
         <div class="submenu">
@@ -260,36 +285,59 @@
             <div class="submenu-item" onclick="pantallaCompleta()">⛶ Pantalla completa</div>
         </div>
     </span>
-
     <span class="menu-item">
         Ayuda
         <div class="submenu">
             <div class="submenu-item" onclick="mostrarAyuda()">📖 Manual de uso</div>
-            <div class="submenu-item" onclick="alert('Versión 2.0 — Con PDF ✅')">ℹ️ Acerca de</div>
+            <div class="submenu-item" onclick="alert('✅ 4 Operaciones + Letras 60px')">ℹ️ Versión</div>
         </div>
     </span>
 </div>
 
-<!-- 🟧 BARRA DE HERRAMIENTAS — BOTÓN PDF ✅ -->
+<!-- 🟧 BARRA DE HERRAMIENTAS — BOTONES DIRECTOS DE OPERACIONES ✅ -->
 <div class="barra-herramientas">
     <span class="barra-nombres" id="nombre-celda">A1</span>
     <span>fx</span>
-    <input type="text" class="barra-formula" id="barra-formula" placeholder="Fórmula: =SUMA(A1:A5)" onkeydown="ejecutarFormula(event)">
+    <input type="text" class="barra-formula" id="barra-formula" placeholder="=A1+B1 o =SUMA(A1:A5)" onkeydown="ejecutarFormula(event)">
     
+    <!-- 🔤 FUENTES — 12 Tipos -->
     <select id="fuente" onchange="cambiarFuente(this.value)">
         <option value="Arial, sans-serif">Arial</option>
         <option value="'Segoe UI', sans-serif" selected>Segoe UI</option>
         <option value="Verdana, sans-serif">Verdana</option>
+        <option value="'Times New Roman', serif">Times New Roman</option>
+        <option value="Georgia, serif">Georgia</option>
+        <option value="'Courier New', monospace">Courier New</option>
+        <option value="'Comic Sans MS', cursive">Comic Sans MS</option>
+        <option value="'Impact', sans-serif">Impact</option>
+        <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+        <option value="'Palatino', serif">Palatino</option>
+        <option value="'Garamond', serif">Garamond</option>
+        <option value="'Tahoma', sans-serif">Tahoma</option>
     </select>
     
+    <!-- 📏 TAMAÑO HASTA 60px -->
     <select id="tamano-letra" onchange="cambiarTamano(this.value)">
         <option value="10px">10</option>
-        <option value="12px" selected>12</option>
+        <option value="12px">12</option>
         <option value="14px">14</option>
         <option value="16px">16</option>
         <option value="18px">18</option>
         <option value="24px">24</option>
+        <option value="30px">30</option>
+        <option value="36px">36</option>
+        <option value="42px">42</option>
+        <option value="48px">48</option>
+        <option value="54px">54</option>
+        <option value="60px">60 🔥</option>
     </select>
+
+    <!-- ➕➖✖️➗ BOTONES DIRECTOS -->
+    <button class="btn-op separador" onclick="agregarOperacion('+')" title="Suma">+</button>
+    <button class="btn-op" onclick="agregarOperacion('-')" title="Resta">−</button>
+    <button class="btn-op" onclick="agregarOperacion('*')" title="Multiplicación">×</button>
+    <button class="btn-op" onclick="agregarOperacion('/')" title="División">÷</button>
+    <button class="btn-op" onclick="calcular()" title="Calcular">=</button>
 
     <button class="separador" onclick="alternarNegrita()"><b>B</b></button>
     <button onclick="alternarCursiva()"><i>I</i></button>
@@ -299,24 +347,28 @@
     <button onclick="centrarTexto()">≡</button>
     <button onclick="alinearDerecha()">▶</button>
 
-    <div class="separador" style="display:flex; gap:3px;">
-        <button class="color-btn" style="background:#000;" onclick="cambiarColorLetra('#000')"></button>
-        <button class="color-btn" style="background:#e74c3c;" onclick="cambiarColorLetra('#e74c3c')"></button>
-        <button class="color-btn" style="background:#3498db;" onclick="cambiarColorLetra('#3498db')"></button>
-        <button class="color-btn" style="background:#27ae60;" onclick="cambiarColorLetra('#27ae60')"></button>
-    </div>
-    <div style="display:flex; gap:3px;">
-        <button class="color-btn" style="background:#fff; border:1px solid #ccc;" onclick="cambiarFondo('#fff')"></button>
-        <button class="color-btn" style="background:#fef9e7;" onclick="cambiarFondo('#fef9e7')"></button>
-        <button class="color-btn" style="background:#d4efdf;" onclick="cambiarFondo('#d4efdf')"></button>
+    <div class="separador" style="display:flex; gap:4px; align-items:center;">
+        <span style="font-size:11px; color:#666;">Letra:</span>
+        <button class="color-btn" style="background:#000000;" title="Negro" onclick="cambiarColorLetra('#000000')"></button>
+        <button class="color-btn" style="background:#e74c3c;" title="Rojo" onclick="cambiarColorLetra('#e74c3c')"></button>
+        <button class="color-btn" style="background:#3498db;" title="Azul" onclick="cambiarColorLetra('#3498db')"></button>
+        <button class="color-btn" style="background:#27ae60;" title="Verde" onclick="cambiarColorLetra('#27ae60')"></button>
+        <button class="color-btn" style="background:#f39c12;" title="Naranjo" onclick="cambiarColorLetra('#f39c12')"></button>
     </div>
 
-    <button class="separador btn-pdf" onclick="exportarPDF()">📄 PDF ✅</button>
-    <button onclick="calcularTodo()">🔄</button>
+    <div style="display:flex; gap:4px; align-items:center;">
+        <span style="font-size:11px; color:#666;">Fondo:</span>
+        <button class="color-btn" style="background:#ffffff; border:2px solid #ccc;" title="Blanco" onclick="cambiarFondo('#ffffff')"></button>
+        <button class="color-btn" style="background:#fef9e7;" title="Amarillo" onclick="cambiarFondo('#fef9e7')"></button>
+        <button class="color-btn" style="background:#d4efdf;" title="Verde" onclick="cambiarFondo('#d4efdf')"></button>
+        <button class="color-btn" style="background:#d6eaf8;" title="Azul" onclick="cambiarFondo('#d6eaf8')"></button>
+        <button class="color-btn" style="background:#f4ecf7;" title="Rosa" onclick="cambiarFondo('#f4ecf7')"></button>
+    </div>
+
+    <button class="separador btn-pdf" onclick="exportarPDF()">📄 PDF</button>
     <button onclick="limpiarCelda()">🗑️</button>
 </div>
 
-<!-- 📊 TABLA -->
 <div class="contenedor-tabla" id="zona-imprimir">
     <table id="hoja">
         <thead id="cabecera">
@@ -328,13 +380,12 @@
     </table>
 </div>
 
-<!-- 📉 BARRA INFERIOR -->
 <div class="barra-inferior">
     <span class="pestana activa" onclick="cambiarHoja(this)">Hoja1</span>
     <span class="pestana" onclick="cambiarHoja(this)">Hoja2</span>
     <span class="pestana" onclick="cambiarHoja(this)">Hoja3</span>
     <button style="margin-left:auto; padding:4px 8px; font-size:11px;" onclick="agregarHoja()">➕ Hoja</button>
-    <span style="font-size:12px; color:#666; margin-left:10px;">✅ Listo</span>
+    <span style="font-size:12px; color:#666; margin-left:10px;">✅ 4 Operaciones listas</span>
 </div>
 
 <input type="file" id="cargador" accept=".json" style="display:none">
@@ -346,7 +397,6 @@ let celdaActiva = null;
 let datos = {};
 let escala = 1;
 
-// 📌 INICIAR TABLA
 function iniciarTabla() {
     const cuerpo = document.getElementById('cuerpo');
     cuerpo.innerHTML = '';
@@ -367,7 +417,6 @@ function iniciarTabla() {
     }
 }
 
-// 📌 SELECCIONAR CELDA
 function seleccionarCelda(id) {
     if (celdaActiva) { const ant = document.getElementById(celdaActiva); if (ant) ant.classList.remove('seleccionada'); }
     celdaActiva = id;
@@ -377,7 +426,6 @@ function seleccionarCelda(id) {
     document.getElementById('barra-formula').value = celda.dataset.formula || celda.textContent;
 }
 
-// 📌 DETECTAR ENTER
 function detectarEnter(e) {
     if (e.key === 'Enter') {
         e.preventDefault();
@@ -391,76 +439,127 @@ function detectarEnter(e) {
     }
 }
 
-// 🔢 FÓRMULAS
+// ➕➖✖️➗ AGREGAR OPERACIÓN DESDE BOTÓN
+function agregarOperacion(op) {
+    if (!celdaActiva) return alert('⚠️ Selecciona una celda primero');
+    const barra = document.getElementById('barra-formula');
+    if (!barra.value.startsWith('=')) barra.value = '=' + celdaActiva + op;
+    else barra.value += op;
+    barra.focus();
+}
+
+// = CALCULAR DESDE BOTÓN
+function calcular() {
+    if (!celdaActiva) return alert('⚠️ Selecciona una celda primero');
+    const valor = document.getElementById('barra-formula').value;
+    document.getElementById(celdaActiva).textContent = valor;
+    evaluarCelda(celdaActiva);
+}
+
+// 🔢 EVALUAR TODAS LAS FÓRMULAS — 4 OPERACIONES ✅
 function evaluarCelda(id) {
     const celda = document.getElementById(id);
     const valor = celda.textContent.trim();
-    if (valor.startsWith('=')) {
-        celda.dataset.formula = valor;
-        let expresion = valor.substring(1).toUpperCase();
-        
-        expresion = expresion.replace(/SUMA\s*\(\s*([A-Z]+)(\d+)\s*:\s*([A-Z]+)(\d+)\s*\)/g, (m, l1, f1, l2, f2) => {
-            let suma = 0;
-            const ci = l1.charCodeAt(0), cf = l2.charCodeAt(0);
-            const fi = parseInt(f1), ff = parseInt(f2);
-            for (let f = fi; f <= ff; f++) {
-                for (let c = ci; c <= cf; c++) {
-                    const cel = document.getElementById(`${String.fromCharCode(c)}${f}`);
-                    if (cel && cel.textContent && !isNaN(parseFloat(cel.textContent))) suma += parseFloat(cel.textContent);
-                }
+    if (!valor.startsWith('=')) { guardarDatos(); return; }
+    
+    celda.dataset.formula = valor;
+    let expresion = valor.substring(1);
+    
+    // ➕ SUMA POR RANGO: =SUMA(A1:A5)
+    expresion = expresion.replace(/SUMA\s*\(\s*([A-Z]+)(\d+)\s*:\s*([A-Z]+)(\d+)\s*\)/gi, (m, l1, f1, l2, f2) => {
+        let suma = 0;
+        const ci = l1.charCodeAt(0), cf = l2.charCodeAt(0);
+        const fi = parseInt(f1), ff = parseInt(f2);
+        for (let f = fi; f <= ff; f++) {
+            for (let c = ci; c <= cf; c++) {
+                const cel = document.getElementById(`${String.fromCharCode(c)}${f}`);
+                if (cel && cel.textContent && !isNaN(parseFloat(cel.textContent))) suma += parseFloat(cel.textContent);
             }
-            return suma;
-        });
+        }
+        return suma;
+    });
 
-        expresion = expresion.replace(/PROMEDIO\s*\(\s*([A-Z]+)(\d+)\s*:\s*([A-Z]+)(\d+)\s*\)/g, (m, l1, f1, l2, f2) => {
-            let suma = 0, cont = 0;
-            const ci = l1.charCodeAt(0), cf = l2.charCodeAt(0);
-            const fi = parseInt(f1), ff = parseInt(f2);
-            for (let f = fi; f <= ff; f++) {
-                for (let c = ci; c <= cf; c++) {
-                    const cel = document.getElementById(`${String.fromCharCode(c)}${f}`);
-                    if (cel && cel.textContent && !isNaN(parseFloat(cel.textContent))) { suma += parseFloat(cel.textContent); cont++; }
-                }
+    // ➖ RESTA: =RESTA(A1-B1)
+    expresion = expresion.replace(/RESTA\s*\(\s*([A-Z]+\d+)\s*-\s*([A-Z]+\d+)\s*\)/gi, (m, c1, c2) => {
+        const v1 = obtenerValor(c1);
+        const v2 = obtenerValor(c2);
+        return v1 - v2;
+    });
+
+    // ✖️ MULTIPLICACIÓN: =MULTIPLICAR(A1*B1)
+    expresion = expresion.replace(/MULTIPLICAR\s*\(\s*([A-Z]+\d+)\s*\*\s*([A-Z]+\d+)\s*\)/gi, (m, c1, c2) => {
+        const v1 = obtenerValor(c1);
+        const v2 = obtenerValor(c2);
+        return v1 * v2;
+    });
+
+    // ➗ DIVISIÓN: =DIVIDIR(A1/B1)
+    expresion = expresion.replace(/DIVIDIR\s*\(\s*([A-Z]+\d+)\s*\/\s*([A-Z]+\d+)\s*\)/gi, (m, c1, c2) => {
+        const v1 = obtenerValor(c1);
+        const v2 = obtenerValor(c2);
+        if (v2 === 0) return '∞';
+        return v1 / v2;
+    });
+
+    // 📊 PROMEDIO
+    expresion = expresion.replace(/PROMEDIO\s*\(\s*([A-Z]+)(\d+)\s*:\s*([A-Z]+)(\d+)\s*\)/gi, (m, l1, f1, l2, f2) => {
+        let suma = 0, cont = 0;
+        const ci = l1.charCodeAt(0), cf = l2.charCodeAt(0);
+        const fi = parseInt(f1), ff = parseInt(f2);
+        for (let f = fi; f <= ff; f++) {
+            for (let c = ci; c <= cf; c++) {
+                const cel = document.getElementById(`${String.fromCharCode(c)}${f}`);
+                if (cel && cel.textContent && !isNaN(parseFloat(cel.textContent))) { suma += parseFloat(cel.textContent); cont++; }
             }
-            return cont > 0 ? suma / cont : 0;
-        });
+        }
+        return cont > 0 ? suma / cont : 0;
+    });
 
-        expresion = expresion.replace(/MIN\s*\(\s*([A-Z]+)(\d+)\s*:\s*([A-Z]+)(\d+)\s*\)/g, (m, l1, f1, l2, f2) => {
-            let min = Infinity;
-            const ci = l1.charCodeAt(0), cf = l2.charCodeAt(0);
-            const fi = parseInt(f1), ff = parseInt(f2);
-            for (let f = fi; f <= ff; f++) {
-                for (let c = ci; c <= cf; c++) {
-                    const cel = document.getElementById(`${String.fromCharCode(c)}${f}`);
-                    if (cel && cel.textContent && !isNaN(parseFloat(cel.textContent))) min = Math.min(min, parseFloat(cel.textContent));
-                }
+    // ⬇️ MIN
+    expresion = expresion.replace(/MIN\s*\(\s*([A-Z]+)(\d+)\s*:\s*([A-Z]+)(\d+)\s*\)/gi, (m, l1, f1, l2, f2) => {
+        let min = Infinity;
+        const ci = l1.charCodeAt(0), cf = l2.charCodeAt(0);
+        const fi = parseInt(f1), ff = parseInt(f2);
+        for (let f = fi; f <= ff; f++) {
+            for (let c = ci; c <= cf; c++) {
+                const cel = document.getElementById(`${String.fromCharCode(c)}${f}`);
+                if (cel && cel.textContent && !isNaN(parseFloat(cel.textContent))) min = Math.min(min, parseFloat(cel.textContent));
             }
-            return min === Infinity ? 0 : min;
-        });
+        }
+        return min === Infinity ? 0 : min;
+    });
 
-        expresion = expresion.replace(/MAX\s*\(\s*([A-Z]+)(\d+)\s*:\s*([A-Z]+)(\d+)\s*\)/g, (m, l1, f1, l2, f2) => {
-            let max = -Infinity;
-            const ci = l1.charCodeAt(0), cf = l2.charCodeAt(0);
-            const fi = parseInt(f1), ff = parseInt(f2);
-            for (let f = fi; f <= ff; f++) {
-                for (let c = ci; c <= cf; c++) {
-                    const cel = document.getElementById(`${String.fromCharCode(c)}${f}`);
-                    if (cel && cel.textContent && !isNaN(parseFloat(cel.textContent))) max = Math.max(max, parseFloat(cel.textContent));
-                }
+    // ⬆️ MAX
+    expresion = expresion.replace(/MAX\s*\(\s*([A-Z]+)(\d+)\s*:\s*([A-Z]+)(\d+)\s*\)/gi, (m, l1, f1, l2, f2) => {
+        let max = -Infinity;
+        const ci = l1.charCodeAt(0), cf = l2.charCodeAt(0);
+        const fi = parseInt(f1), ff = parseInt(f2);
+        for (let f = fi; f <= ff; f++) {
+            for (let c = ci; c <= cf; c++) {
+                const cel = document.getElementById(`${String.fromCharCode(c)}${f}`);
+                if (cel && cel.textContent && !isNaN(parseFloat(cel.textContent))) max = Math.max(max, parseFloat(cel.textContent));
             }
-            return max === -Infinity ? 0 : max;
-        });
+        }
+        return max === -Infinity ? 0 : max;
+    });
 
-        expresion = expresion.replace(/([A-Z])(\d+)/g, (m, l, n) => {
-            const cel = document.getElementById(m);
-            if (!cel || !cel.textContent || isNaN(parseFloat(cel.textContent))) return 0;
-            return parseFloat(cel.textContent);
-        });
+    // Referencias directas A1, B2... y operaciones simples =A1+B1-C1
+    expresion = expresion.replace(/([A-Z])(\d+)/g, (m, l, n) => obtenerValor(m));
 
-        try { celda.textContent = Function(`"use strict"; return (${expresion})`)(); }
-        catch { celda.textContent = '#ERROR!'; }
+    try {
+        const resultado = Function(`"use strict"; return (${expresion})`)();
+        celda.textContent = resultado;
     }
+    catch { celda.textContent = '#ERROR!'; }
+    
     guardarDatos();
+}
+
+// 🔧 OBTENER VALOR DE CELDA
+function obtenerValor(id) {
+    const cel = document.getElementById(id);
+    if (!cel || !cel.textContent || isNaN(parseFloat(cel.textContent))) return 0;
+    return parseFloat(cel.textContent);
 }
 
 function ejecutarFormula(e) {
@@ -482,12 +581,74 @@ function calcularTodo() {
     document.querySelectorAll('td[contenteditable="true"]').forEach(cel => {
         if (cel.dataset.formula) { cel.textContent = cel.dataset.formula; evaluarCelda(cel.id); }
     });
-    alert('✅ Recalculado');
+    alert('✅ Todas las fórmulas recalculadas');
 }
 
-// ➕ INSERTAR FILAS/COLUMNAS
+// 🎨 COLORES
+function cambiarColorLetra(color) {
+    if (!celdaActiva) return alert('⚠️ Toca una celda primero');
+    document.getElementById(celdaActiva).style.color = color;
+}
+
+function cambiarFondo(color) {
+    if (!celdaActiva) return alert('⚠️ Toca una celda primero');
+    document.getElementById(celdaActiva).style.backgroundColor = color;
+}
+
+// 🔤 FUENTE Y TAMAÑO
+function cambiarTamano(tam) {
+    if (!celdaActiva) return alert('⚠️ Selecciona celda');
+    document.getElementById(celdaActiva).style.fontSize = tam;
+}
+
+function cambiarFuente(fuente) {
+    if (!celdaActiva) return alert('⚠️ Selecciona celda');
+    document.getElementById(celdaActiva).style.fontFamily = fuente;
+}
+
+function alternarNegrita() {
+    if (!celdaActiva) return alert('⚠️ Selecciona celda');
+    const c = document.getElementById(celdaActiva);
+    c.style.fontWeight = c.style.fontWeight === 'bold' ? 'normal' : 'bold';
+}
+
+function alternarCursiva() {
+    if (!celdaActiva) return alert('⚠️ Selecciona celda');
+    const c = document.getElementById(celdaActiva);
+    c.style.fontStyle = c.style.fontStyle === 'italic' ? 'normal' : 'italic';
+}
+
+function alternarSubrayado() {
+    if (!celdaActiva) return alert('⚠️ Selecciona celda');
+    const c = document.getElementById(celdaActiva);
+    c.style.textDecoration = c.style.textDecoration === 'underline' ? 'none' : 'underline';
+}
+
+function centrarTexto() {
+    if (!celdaActiva) return alert('⚠️ Selecciona celda');
+    document.getElementById(celdaActiva).style.textAlign = 'center';
+}
+
+function alinearIzquierda() {
+    if (!celdaActiva) return alert('⚠️ Selecciona celda');
+    document.getElementById(celdaActiva).style.textAlign = 'left';
+}
+
+function alinearDerecha() {
+    if (!celdaActiva) return alert('⚠️ Selecciona celda');
+    document.getElementById(celdaActiva).style.textAlign = 'right';
+}
+
+function limpiarCelda() {
+    if (!celdaActiva) return alert('⚠️ Selecciona celda');
+    const c = document.getElementById(celdaActiva);
+    c.textContent = '';
+    c.dataset.formula = '';
+    c.style = '';
+}
+
 function insertarFilaArriba() {
-    if (!celdaActiva) return alert('⚠️ Selecciona una celda');
+    if (!celdaActiva) return alert('⚠️ Selecciona una celda primero');
     const numFila = parseInt(celdaActiva.match(/\d+/)[0]);
     filas++;
     const cuerpo = document.getElementById('cuerpo');
@@ -500,15 +661,16 @@ function insertarFilaArriba() {
         celda.id = `${letra}${numFila}`;
         celda.onclick = () => seleccionarCelda(celda.id);
         celda.onblur = () => evaluarCelda(celda.id);
+        celda.setAttribute('onkeydown', 'detectarEnter(event)');
         nuevaFila.appendChild(celda);
     }
     cuerpo.insertBefore(nuevaFila, cuerpo.children[numFila - 1]);
     renumerarFilas();
-    alert('✅ Fila insertada');
+    alert('✅ Fila insertada arriba');
 }
 
 function insertarFilaAbajo() {
-    if (!celdaActiva) return alert('⚠️ Selecciona una celda');
+    if (!celdaActiva) return alert('⚠️ Selecciona una celda primero');
     const numFila = parseInt(celdaActiva.match(/\d+/)[0]);
     filas++;
     const cuerpo = document.getElementById('cuerpo');
@@ -521,15 +683,16 @@ function insertarFilaAbajo() {
         celda.id = `${letra}${numFila + 1}`;
         celda.onclick = () => seleccionarCelda(celda.id);
         celda.onblur = () => evaluarCelda(celda.id);
+        celda.setAttribute('onkeydown', 'detectarEnter(event)');
         nuevaFila.appendChild(celda);
     }
     cuerpo.insertBefore(nuevaFila, cuerpo.children[numFila]);
     renumerarFilas();
-    alert('✅ Fila insertada');
+    alert('✅ Fila insertada abajo');
 }
 
 function insertarColumnaDerecha() {
-    if (!celdaActiva) return alert('⚠️ Selecciona una celda');
+    if (!celdaActiva) return alert('⚠️ Selecciona una celda primero');
     columnas++;
     const nuevaLetra = String.fromCharCode(65 + columnas - 1);
     const cab = document.querySelector('#cabecera tr');
@@ -542,6 +705,7 @@ function insertarColumnaDerecha() {
         celda.id = `${nuevaLetra}${i + 1}`;
         celda.onclick = () => seleccionarCelda(celda.id);
         celda.onblur = () => evaluarCelda(celda.id);
+        celda.setAttribute('onkeydown', 'detectarEnter(event)');
         fila.appendChild(celda);
     });
     alert(`✅ Columna ${nuevaLetra} insertada`);
@@ -553,80 +717,60 @@ function renumerarFilas() {
     });
 }
 
-// 🎨 FORMATO
-function cambiarTamano(tam) { if (!celdaActiva) return alert('⚠️ Selecciona celda'); document.getElementById(celdaActiva).style.fontSize = tam; }
-function cambiarFuente(fuente) { if (!celdaActiva) return alert('⚠️ Selecciona celda'); document.getElementById(celdaActiva).style.fontFamily = fuente; }
-function cambiarColorLetra(color) { if (!celdaActiva) return alert('⚠️ Selecciona celda'); document.getElementById(celdaActiva).style.color = color; }
-function cambiarFondo(color) { if (!celdaActiva) return alert('⚠️ Selecciona celda'); document.getElementById(celdaActiva).style.backgroundColor = color; }
-function alternarNegrita() { if (!celdaActiva) return alert('⚠️ Selecciona celda'); const c = document.getElementById(celdaActiva); c.style.fontWeight = c.style.fontWeight === 'bold' ? 'normal' : 'bold'; }
-function alternarCursiva() { if (!celdaActiva) return alert('⚠️ Selecciona celda'); const c = document.getElementById(celdaActiva); c.style.fontStyle = c.style.fontStyle === 'italic' ? 'normal' : 'italic'; }
-function alternarSubrayado() { if (!celdaActiva) return alert('⚠️ Selecciona celda'); const c = document.getElementById(celdaActiva); c.style.textDecoration = c.style.textDecoration === 'underline' ? 'none' : 'underline'; }
-function centrarTexto() { if (!celdaActiva) return alert('⚠️ Selecciona celda'); document.getElementById(celdaActiva).style.textAlign = 'center'; }
-function alinearIzquierda() { if (!celdaActiva) return alert('⚠️ Selecciona celda'); document.getElementById(celdaActiva).style.textAlign = 'left'; }
-function alinearDerecha() { if (!celdaActiva) return alert('⚠️ Selecciona celda'); document.getElementById(celdaActiva).style.textAlign = 'right'; }
-function limpiarCelda() { if (!celdaActiva) return alert('⚠️ Selecciona celda'); const c = document.getElementById(celdaActiva); c.textContent = ''; c.dataset.formula = ''; c.style = ''; }
-
-// 👁️ VER
-function zoom(porcentaje) { escala = parseFloat(porcentaje) / 100; document.querySelector('.contenedor-tabla').style.transform = `scale(${escala})`; alert(`✅ Zoom: ${porcentaje}`); }
-function pantallaCompleta() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
-
-// ❓ AYUDA
-function mostrarAyuda() {
-    alert(`📖 MANUAL DE USO
-
-📌 Toca celdas para editar
-📐 Fórmulas: =SUMA(A1:A5) =PROMEDIO() =MIN() =MAX()
-➕ Insertar filas/columnas desde el menú
-📄 Botón 📄 PDF → Descarga directa en PDF
-💾 Guardar: Archivo → Guardar
-🖨️ Imprimir: Archivo → Imprimir
-
-¡Todo listo! ✅`);
+function zoom(porcentaje) {
+    escala = parseFloat(porcentaje) / 100;
+    document.querySelector('.contenedor-tabla').style.transform = `scale(${escala})`;
+    document.querySelector('.contenedor-tabla').style.transformOrigin = 'top left';
+    alert(`✅ Zoom: ${porcentaje}`);
 }
 
-// 📄 EXPORTAR A PDF — FUNCION DIRECTA ✅
+function pantallaCompleta() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+}
+
+function mostrarAyuda() {
+    alert(`📖 MANUAL — 4 OPERACIONES ✅
+
+➕ SUMA: =A1+B1 o =SUMA(A1:A5)
+➖ RESTA: =A1-B1 o =RESTA(A1-B1)
+✖️ MULTIPLICACIÓN: =A1*B1 o =MULTIPLICAR(A1*B1)
+➗ DIVISIÓN: =A1/B1 o =DIVIDIR(A1/B1)
+
+🔘 BOTONES RÁPIDOS: + − × ÷ =
+👉 Toca celda → botón operación → escribe celda → = para calcular
+
+📏 Letras hasta 60px | 12 Fuentes
+🎨 Colores letra y fondo
+📄 PDF con todo incluido
+
+¡Todo listo para usar! 🎉`);
+}
+
 async function exportarPDF() {
     const cargando = document.getElementById('cargando');
     cargando.classList.add('show');
-    
     try {
         const elemento = document.getElementById('zona-imprimir');
-        const lienzo = await html2canvas(elemento, {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: '#ffffff',
-            logging: false
-        });
-
+        const lienzo = await html2canvas(elemento, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
         const imgData = lienzo.toDataURL('image/png');
-        const pdf = new jsPDF('l', 'mm', 'a4'); // L = Horizontal, mejor para tablas
-        
+        const pdf = new jsPDF('l', 'mm', 'a4');
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
         const imgWidth = lienzo.width;
         const imgHeight = lienzo.height;
-        
-        // Ajustar imagen al PDF
         const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
         const finalWidth = imgWidth * ratio;
         const finalHeight = imgHeight * ratio;
-        const x = (pageWidth - finalWidth) / 2; // Centrar
-
+        const x = (pageWidth - finalWidth) / 2;
         pdf.addImage(imgData, 'PNG', x, 5, finalWidth, finalHeight);
         pdf.save('HojaCalculo.pdf');
-        
-        alert('✅ PDF generado y descargado como "HojaCalculo.pdf" 🎉');
+        alert('✅ PDF descargado 🎉');
     }
-    catch (error) {
-        console.error(error);
-        alert('❌ Error al generar PDF. Intenta de nuevo o usa Archivo → Imprimir → Guardar como PDF');
-    }
-    finally {
-        cargando.classList.remove('show');
-    }
+    catch (error) { alert('❌ Error: usa Archivo → Imprimir → Guardar como PDF'); }
+    finally { cargando.classList.remove('show'); }
 }
 
-// 💾 GUARDAR Y CARGAR
 function guardarDatos() {
     datos = { filas, columnas, celdas: {} };
     document.querySelectorAll('td[contenteditable="true"]').forEach(c => {
@@ -698,7 +842,6 @@ function nuevoDocumento() {
 function cambiarHoja(e) { document.querySelectorAll('.pestana').forEach(p => p.classList.remove('activa')); e.classList.add('activa'); }
 function agregarHoja() { const n = prompt('Nombre de hoja:'); if (!n) return; const p = document.createElement('span'); p.className='pestana'; p.textContent=n; p.onclick=function(){cambiarHoja(this)}; document.querySelector('.barra-inferior').insertBefore(p, document.querySelector('.barra-inferior button')); }
 
-// 🚀 INICIAR
 iniciarTabla();
 </script>
 
