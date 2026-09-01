@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hoja de Cálculo — 4 Operaciones</title>
+    <title>Hoja de Cálculo — PDF Sin Líneas</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
@@ -126,8 +126,8 @@
             min-width: 1000px;
         }
         th, td {
-            border: 1px solid #d0d7de;
-            padding: 5px 8px;
+            border: 1px solid #d0d7de; /* Líneas visibles en pantalla SOLO */
+            padding: 8px 10px;
             min-width: 100px;
             font-size: 13px;
             vertical-align: middle;
@@ -159,8 +159,24 @@
         }
         td:focus, td.seleccionada {
             border: 2px solid #2b579a;
-            padding: 4px 7px;
+            padding: 7px 9px;
             background: #e8f0fe;
+        }
+
+        /* 📄 CLASE ESPECIAL PARA PDF — SIN LÍNEAS ✅ */
+        .sin-lineas-pdf th,
+        .sin-lineas-pdf td {
+            border: none !important;
+        }
+        .sin-lineas-pdf th {
+            background: transparent !important;
+            border-bottom: 2px solid #333 !important;
+            font-weight: bold;
+        }
+        .sin-lineas-pdf td:first-child {
+            background: transparent !important;
+            font-weight: normal;
+            color: #666;
         }
 
         .cargando {
@@ -217,13 +233,14 @@
 </div>
 
 <div class="barra-menu">
-    <span class="logo">📊 Hoja de Cálculo-R.S</span>
+    <span class="logo">📊 Hoja de Cálculo</span>
     <span class="menu-item">
         Archivo
         <div class="submenu">
             <div class="submenu-item" onclick="guardarArchivo()">💾 Guardar</div>
             <div class="submenu-item" onclick="cargarArchivo()">📂 Abrir</div>
-            <div class="submenu-item" onclick="exportarPDF()">📄 Exportar PDF</div>
+            <div class="submenu-item" onclick="exportarPDF()">📄 Exportar PDF (Sin líneas)</div>
+            <div class="submenu-item" onclick="exportarPDFconLineas()">📄 Exportar PDF (Con líneas)</div>
             <div class="submenu-separador"></div>
             <div class="submenu-item" onclick="nuevoDocumento()">🆕 Nuevo</div>
             <div class="submenu-separador"></div>
@@ -289,12 +306,12 @@
         Ayuda
         <div class="submenu">
             <div class="submenu-item" onclick="mostrarAyuda()">📖 Manual de uso</div>
-            <div class="submenu-item" onclick="alert('✅ 4 Operaciones + Letras 60px')">ℹ️ Versión</div>
+            <div class="submenu-item" onclick="alert('✅ PDF Sin Líneas + 4 Operaciones')">ℹ️ Versión</div>
         </div>
     </span>
 </div>
 
-<!-- 🟧 BARRA DE HERRAMIENTAS — BOTONES DIRECTOS DE OPERACIONES ✅ -->
+<!-- 🟧 BARRA DE HERRAMIENTAS — BOTONES OPERACIONES -->
 <div class="barra-herramientas">
     <span class="barra-nombres" id="nombre-celda">A1</span>
     <span>fx</span>
@@ -385,7 +402,7 @@
     <span class="pestana" onclick="cambiarHoja(this)">Hoja2</span>
     <span class="pestana" onclick="cambiarHoja(this)">Hoja3</span>
     <button style="margin-left:auto; padding:4px 8px; font-size:11px;" onclick="agregarHoja()">➕ Hoja</button>
-    <span style="font-size:12px; color:#666; margin-left:10px;">✅ 4 Operaciones listas</span>
+    <span style="font-size:12px; color:#666; margin-left:10px;">✅ PDF sin líneas</span>
 </div>
 
 <input type="file" id="cargador" accept=".json" style="display:none">
@@ -439,7 +456,7 @@ function detectarEnter(e) {
     }
 }
 
-// ➕➖✖️➗ AGREGAR OPERACIÓN DESDE BOTÓN
+// ➕➖✖️➗ OPERACIONES
 function agregarOperacion(op) {
     if (!celdaActiva) return alert('⚠️ Selecciona una celda primero');
     const barra = document.getElementById('barra-formula');
@@ -448,7 +465,6 @@ function agregarOperacion(op) {
     barra.focus();
 }
 
-// = CALCULAR DESDE BOTÓN
 function calcular() {
     if (!celdaActiva) return alert('⚠️ Selecciona una celda primero');
     const valor = document.getElementById('barra-formula').value;
@@ -456,7 +472,12 @@ function calcular() {
     evaluarCelda(celdaActiva);
 }
 
-// 🔢 EVALUAR TODAS LAS FÓRMULAS — 4 OPERACIONES ✅
+function obtenerValor(id) {
+    const cel = document.getElementById(id);
+    if (!cel || !cel.textContent || isNaN(parseFloat(cel.textContent))) return 0;
+    return parseFloat(cel.textContent);
+}
+
 function evaluarCelda(id) {
     const celda = document.getElementById(id);
     const valor = celda.textContent.trim();
@@ -465,7 +486,7 @@ function evaluarCelda(id) {
     celda.dataset.formula = valor;
     let expresion = valor.substring(1);
     
-    // ➕ SUMA POR RANGO: =SUMA(A1:A5)
+    // SUMA
     expresion = expresion.replace(/SUMA\s*\(\s*([A-Z]+)(\d+)\s*:\s*([A-Z]+)(\d+)\s*\)/gi, (m, l1, f1, l2, f2) => {
         let suma = 0;
         const ci = l1.charCodeAt(0), cf = l2.charCodeAt(0);
@@ -479,29 +500,20 @@ function evaluarCelda(id) {
         return suma;
     });
 
-    // ➖ RESTA: =RESTA(A1-B1)
-    expresion = expresion.replace(/RESTA\s*\(\s*([A-Z]+\d+)\s*-\s*([A-Z]+\d+)\s*\)/gi, (m, c1, c2) => {
-        const v1 = obtenerValor(c1);
-        const v2 = obtenerValor(c2);
-        return v1 - v2;
-    });
+    // RESTA
+    expresion = expresion.replace(/RESTA\s*\(\s*([A-Z]+\d+)\s*-\s*([A-Z]+\d+)\s*\)/gi, (m, c1, c2) => obtenerValor(c1) - obtenerValor(c2));
 
-    // ✖️ MULTIPLICACIÓN: =MULTIPLICAR(A1*B1)
-    expresion = expresion.replace(/MULTIPLICAR\s*\(\s*([A-Z]+\d+)\s*\*\s*([A-Z]+\d+)\s*\)/gi, (m, c1, c2) => {
-        const v1 = obtenerValor(c1);
-        const v2 = obtenerValor(c2);
-        return v1 * v2;
-    });
+    // MULTIPLICAR
+    expresion = expresion.replace(/MULTIPLICAR\s*\(\s*([A-Z]+\d+)\s*\*\s*([A-Z]+\d+)\s*\)/gi, (m, c1, c2) => obtenerValor(c1) * obtenerValor(c2));
 
-    // ➗ DIVISIÓN: =DIVIDIR(A1/B1)
+    // DIVIDIR
     expresion = expresion.replace(/DIVIDIR\s*\(\s*([A-Z]+\d+)\s*\/\s*([A-Z]+\d+)\s*\)/gi, (m, c1, c2) => {
-        const v1 = obtenerValor(c1);
         const v2 = obtenerValor(c2);
         if (v2 === 0) return '∞';
-        return v1 / v2;
+        return obtenerValor(c1) / v2;
     });
 
-    // 📊 PROMEDIO
+    // PROMEDIO
     expresion = expresion.replace(/PROMEDIO\s*\(\s*([A-Z]+)(\d+)\s*:\s*([A-Z]+)(\d+)\s*\)/gi, (m, l1, f1, l2, f2) => {
         let suma = 0, cont = 0;
         const ci = l1.charCodeAt(0), cf = l2.charCodeAt(0);
@@ -515,7 +527,7 @@ function evaluarCelda(id) {
         return cont > 0 ? suma / cont : 0;
     });
 
-    // ⬇️ MIN
+    // MIN
     expresion = expresion.replace(/MIN\s*\(\s*([A-Z]+)(\d+)\s*:\s*([A-Z]+)(\d+)\s*\)/gi, (m, l1, f1, l2, f2) => {
         let min = Infinity;
         const ci = l1.charCodeAt(0), cf = l2.charCodeAt(0);
@@ -529,7 +541,7 @@ function evaluarCelda(id) {
         return min === Infinity ? 0 : min;
     });
 
-    // ⬆️ MAX
+    // MAX
     expresion = expresion.replace(/MAX\s*\(\s*([A-Z]+)(\d+)\s*:\s*([A-Z]+)(\d+)\s*\)/gi, (m, l1, f1, l2, f2) => {
         let max = -Infinity;
         const ci = l1.charCodeAt(0), cf = l2.charCodeAt(0);
@@ -543,23 +555,14 @@ function evaluarCelda(id) {
         return max === -Infinity ? 0 : max;
     });
 
-    // Referencias directas A1, B2... y operaciones simples =A1+B1-C1
+    // Referencias directas y operaciones simples
     expresion = expresion.replace(/([A-Z])(\d+)/g, (m, l, n) => obtenerValor(m));
 
     try {
-        const resultado = Function(`"use strict"; return (${expresion})`)();
-        celda.textContent = resultado;
-    }
-    catch { celda.textContent = '#ERROR!'; }
+        celda.textContent = Function(`"use strict"; return (${expresion})`)();
+    } catch { celda.textContent = '#ERROR!'; }
     
     guardarDatos();
-}
-
-// 🔧 OBTENER VALOR DE CELDA
-function obtenerValor(id) {
-    const cel = document.getElementById(id);
-    if (!cel || !cel.textContent || isNaN(parseFloat(cel.textContent))) return 0;
-    return parseFloat(cel.textContent);
 }
 
 function ejecutarFormula(e) {
@@ -584,61 +587,50 @@ function calcularTodo() {
     alert('✅ Todas las fórmulas recalculadas');
 }
 
-// 🎨 COLORES
+// 🎨 ESTILOS
 function cambiarColorLetra(color) {
     if (!celdaActiva) return alert('⚠️ Toca una celda primero');
     document.getElementById(celdaActiva).style.color = color;
 }
-
 function cambiarFondo(color) {
     if (!celdaActiva) return alert('⚠️ Toca una celda primero');
     document.getElementById(celdaActiva).style.backgroundColor = color;
 }
-
-// 🔤 FUENTE Y TAMAÑO
 function cambiarTamano(tam) {
     if (!celdaActiva) return alert('⚠️ Selecciona celda');
     document.getElementById(celdaActiva).style.fontSize = tam;
 }
-
 function cambiarFuente(fuente) {
     if (!celdaActiva) return alert('⚠️ Selecciona celda');
     document.getElementById(celdaActiva).style.fontFamily = fuente;
 }
-
 function alternarNegrita() {
     if (!celdaActiva) return alert('⚠️ Selecciona celda');
     const c = document.getElementById(celdaActiva);
     c.style.fontWeight = c.style.fontWeight === 'bold' ? 'normal' : 'bold';
 }
-
 function alternarCursiva() {
     if (!celdaActiva) return alert('⚠️ Selecciona celda');
     const c = document.getElementById(celdaActiva);
     c.style.fontStyle = c.style.fontStyle === 'italic' ? 'normal' : 'italic';
 }
-
 function alternarSubrayado() {
     if (!celdaActiva) return alert('⚠️ Selecciona celda');
     const c = document.getElementById(celdaActiva);
     c.style.textDecoration = c.style.textDecoration === 'underline' ? 'none' : 'underline';
 }
-
 function centrarTexto() {
     if (!celdaActiva) return alert('⚠️ Selecciona celda');
     document.getElementById(celdaActiva).style.textAlign = 'center';
 }
-
 function alinearIzquierda() {
     if (!celdaActiva) return alert('⚠️ Selecciona celda');
     document.getElementById(celdaActiva).style.textAlign = 'left';
 }
-
 function alinearDerecha() {
     if (!celdaActiva) return alert('⚠️ Selecciona celda');
     document.getElementById(celdaActiva).style.textAlign = 'right';
 }
-
 function limpiarCelda() {
     if (!celdaActiva) return alert('⚠️ Selecciona celda');
     const c = document.getElementById(celdaActiva);
@@ -647,6 +639,77 @@ function limpiarCelda() {
     c.style = '';
 }
 
+// 📄 PDF SIN LÍNEAS — FUNCIÓN PRINCIPAL ✅
+async function exportarPDF() {
+    const cargando = document.getElementById('cargando');
+    cargando.classList.add('show');
+    
+    // ✅ Quitar líneas temporalmente para el PDF
+    const tabla = document.getElementById('hoja');
+    tabla.classList.add('sin-lineas-pdf');
+    
+    try {
+        const elemento = document.getElementById('zona-imprimir');
+        const lienzo = await html2canvas(elemento, { 
+            scale: 2, 
+            useCORS: true, 
+            backgroundColor: '#ffffff', 
+            logging: false 
+        });
+        const imgData = lienzo.toDataURL('image/png');
+        const pdf = new jsPDF('l', 'mm', 'a4');
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const imgWidth = lienzo.width;
+        const imgHeight = lienzo.height;
+        const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+        const finalWidth = imgWidth * ratio;
+        const finalHeight = imgHeight * ratio;
+        const x = (pageWidth - finalWidth) / 2;
+        pdf.addImage(imgData, 'PNG', x, 5, finalWidth, finalHeight);
+        pdf.save('HojaCalculo_SinLineas.pdf');
+        alert('✅ PDF DESCARGADO — SIN LÍNEAS 🎉');
+    }
+    catch (error) { alert('❌ Error: usa Archivo → Imprimir → Guardar como PDF'); }
+    finally {
+        // ✅ Volver a mostrar líneas en pantalla
+        tabla.classList.remove('sin-lineas-pdf');
+        cargando.classList.remove('show');
+    }
+}
+
+// 📄 PDF CON LÍNEAS — OPCIÓN ALTERNATIVA
+async function exportarPDFconLineas() {
+    const cargando = document.getElementById('cargando');
+    cargando.classList.add('show');
+    
+    try {
+        const elemento = document.getElementById('zona-imprimir');
+        const lienzo = await html2canvas(elemento, { 
+            scale: 2, 
+            useCORS: true, 
+            backgroundColor: '#ffffff', 
+            logging: false 
+        });
+        const imgData = lienzo.toDataURL('image/png');
+        const pdf = new jsPDF('l', 'mm', 'a4');
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const imgWidth = lienzo.width;
+        const imgHeight = lienzo.height;
+        const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+        const finalWidth = imgWidth * ratio;
+        const finalHeight = imgHeight * ratio;
+        const x = (pageWidth - finalWidth) / 2;
+        pdf.addImage(imgData, 'PNG', x, 5, finalWidth, finalHeight);
+        pdf.save('HojaCalculo_ConLineas.pdf');
+        alert('✅ PDF DESCARGADO — CON LÍNEAS 📄');
+    }
+    catch (error) { alert('❌ Error'); }
+    finally { cargando.classList.remove('show'); }
+}
+
+// RESTO DE FUNCIONES
 function insertarFilaArriba() {
     if (!celdaActiva) return alert('⚠️ Selecciona una celda primero');
     const numFila = parseInt(celdaActiva.match(/\d+/)[0]);
@@ -668,7 +731,6 @@ function insertarFilaArriba() {
     renumerarFilas();
     alert('✅ Fila insertada arriba');
 }
-
 function insertarFilaAbajo() {
     if (!celdaActiva) return alert('⚠️ Selecciona una celda primero');
     const numFila = parseInt(celdaActiva.match(/\d+/)[0]);
@@ -690,7 +752,6 @@ function insertarFilaAbajo() {
     renumerarFilas();
     alert('✅ Fila insertada abajo');
 }
-
 function insertarColumnaDerecha() {
     if (!celdaActiva) return alert('⚠️ Selecciona una celda primero');
     columnas++;
@@ -710,67 +771,38 @@ function insertarColumnaDerecha() {
     });
     alert(`✅ Columna ${nuevaLetra} insertada`);
 }
-
 function renumerarFilas() {
     document.querySelectorAll('#cuerpo tr').forEach((fila, i) => {
         fila.firstElementChild.textContent = i + 1;
     });
 }
-
 function zoom(porcentaje) {
     escala = parseFloat(porcentaje) / 100;
     document.querySelector('.contenedor-tabla').style.transform = `scale(${escala})`;
     document.querySelector('.contenedor-tabla').style.transformOrigin = 'top left';
     alert(`✅ Zoom: ${porcentaje}`);
 }
-
 function pantallaCompleta() {
     if (!document.fullscreenElement) document.documentElement.requestFullscreen();
     else document.exitFullscreen();
 }
-
 function mostrarAyuda() {
-    alert(`📖 MANUAL — 4 OPERACIONES ✅
+    alert(`📖 MANUAL — PDF SIN LÍNEAS ✅
+
+📄 Al exportar PDF → NO aparecen líneas
+📄 En pantalla SÍ se ven las líneas para trabajar
 
 ➕ SUMA: =A1+B1 o =SUMA(A1:A5)
 ➖ RESTA: =A1-B1 o =RESTA(A1-B1)
 ✖️ MULTIPLICACIÓN: =A1*B1 o =MULTIPLICAR(A1*B1)
 ➗ DIVISIÓN: =A1/B1 o =DIVIDIR(A1/B1)
 
-🔘 BOTONES RÁPIDOS: + − × ÷ =
-👉 Toca celda → botón operación → escribe celda → = para calcular
-
+🔘 Botones rápidos: + − × ÷ =
 📏 Letras hasta 60px | 12 Fuentes
-🎨 Colores letra y fondo
-📄 PDF con todo incluido
+💾 Guardar / Cargar con fórmulas y estilos
 
-¡Todo listo para usar! 🎉`);
+¡Todo listo! 🎉`);
 }
-
-async function exportarPDF() {
-    const cargando = document.getElementById('cargando');
-    cargando.classList.add('show');
-    try {
-        const elemento = document.getElementById('zona-imprimir');
-        const lienzo = await html2canvas(elemento, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
-        const imgData = lienzo.toDataURL('image/png');
-        const pdf = new jsPDF('l', 'mm', 'a4');
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        const imgWidth = lienzo.width;
-        const imgHeight = lienzo.height;
-        const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
-        const finalWidth = imgWidth * ratio;
-        const finalHeight = imgHeight * ratio;
-        const x = (pageWidth - finalWidth) / 2;
-        pdf.addImage(imgData, 'PNG', x, 5, finalWidth, finalHeight);
-        pdf.save('HojaCalculo.pdf');
-        alert('✅ PDF descargado 🎉');
-    }
-    catch (error) { alert('❌ Error: usa Archivo → Imprimir → Guardar como PDF'); }
-    finally { cargando.classList.remove('show'); }
-}
-
 function guardarDatos() {
     datos = { filas, columnas, celdas: {} };
     document.querySelectorAll('td[contenteditable="true"]').forEach(c => {
@@ -788,7 +820,6 @@ function guardarDatos() {
         };
     });
 }
-
 function guardarArchivo() {
     guardarDatos();
     const blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
@@ -799,7 +830,6 @@ function guardarArchivo() {
     a.click();
     alert('✅ Guardado');
 }
-
 function cargarArchivo() { document.getElementById('cargador').click(); }
 document.getElementById('cargador').addEventListener('change', e => {
     const arch = e.target.files[0];
@@ -831,14 +861,12 @@ document.getElementById('cargador').addEventListener('change', e => {
     };
     lector.readAsText(arch);
 });
-
 function nuevoDocumento() {
     if (confirm('¿Nuevo documento? Se borrarán los cambios no guardados')) {
         iniciarTabla();
         celdaActiva = null;
     }
 }
-
 function cambiarHoja(e) { document.querySelectorAll('.pestana').forEach(p => p.classList.remove('activa')); e.classList.add('activa'); }
 function agregarHoja() { const n = prompt('Nombre de hoja:'); if (!n) return; const p = document.createElement('span'); p.className='pestana'; p.textContent=n; p.onclick=function(){cambiarHoja(this)}; document.querySelector('.barra-inferior').insertBefore(p, document.querySelector('.barra-inferior button')); }
 
